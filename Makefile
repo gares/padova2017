@@ -7,7 +7,7 @@ jscoq:
 	git clone https://github.com/ejgallego/jscoq-builds.git --depth 1 -b v8.6 jscoq
 	cd jscoq && git checkout 8a44193335dc935274393fd6abd6bf45f2062b9a
 
-udoc: udoc.patch
+udoc:
 	rm -rf udoc
 	git clone https://github.com/ejgallego/udoc.git
 	cd udoc && git checkout d30a1cabcd4b35a8e60104c7a3855bf4ca60398e
