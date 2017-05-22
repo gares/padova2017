@@ -26,5 +26,7 @@ coq/bin/coqide:
 edit:
 	./coq/bin/coqide lesson*v
 
-run:
+deploy: jscoq
+
+run-local:
 	python3 -m http.server 8000
