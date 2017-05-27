@@ -147,28 +147,26 @@ Eval compute in g 3 4.
 
 Module ProvaBoolNat.
 
-Inductive Bool := True | False.
+Inductive bool := true | false.
 
-(** True e False si chiamano costruttori, e
+(** true e false si chiamano costruttori, e
     corrispondono alle regole $$$$Tipo-I_n$$$$
     nelle note del corso *)
 
-Check True.
+Check true.
 
-Inductive Nat := Zero | Succ (n : Nat).
+(** I numeri naturali à la Peano
 
-Check Zero.
-Check Succ.
+    Nota: _O_ è una o maiuscola, non la cifra zero *)
+Inductive nat := O | S (n : nat).
 
-Check (Succ Zero).
+Check O.
+Check S.
 
-(** Nota: esistono varie sintassi alternative,
-    per esempio
-<<
-Inductive Nat :=
-   Zero : Nat
- | Succ : Nat -> Nat.
->>
+Check (S O).
+
+(** Nota: esistono varie sintassi alternative per
+    la dichiarazione di tipi di dato.
 
   Quella che abbiamo utilizzata è la più simile a quella
   usata nelle note del corso e anche nei linguaggi di
@@ -177,15 +175,21 @@ Inductive Nat :=
 
 *)
 
-Print Nat.
+Print nat.
+
+(**
+<<
+Inductive nat :=
+   O : nat
+ | S : nat -> nat.
+>>
+*)
+
 
 End ProvaBoolNat.
 
-(** utilizzerà l'altra sintassi...
-
-    Ora torniamo a utilizzare _nat_ (in minuscolo)
-    e i suoi costruttori _S_ e _O_ (lettera O maiuscola)
-    in quanto il sistema li stampa meglio (notazione decimale).
+(** Ora torniamo a utilizzare la dichiarazione standard di
+    _nat_ in quanto il sistema li stampa meglio (notazione decimale).
 *)
 
 Print nat.
@@ -293,7 +297,7 @@ Eval compute in addn 2 4.
 ** Tipi di dato polimorfi
 
  - La coppia (a,b) dove a : A e b : B
- - La list x1 :: .. :: xn dove x_i : A
+ - La lista x1 :: .. :: xn dove x_i : A
 
 *)
 
@@ -384,7 +388,12 @@ Eval compute in length (cons 3 (cons 4 nil)).
 (** #<div class="slide vfill">#
 ** Wrap up
 
- - ....
+ - funzioni anonime: [fun x : nat => x + 1]
+ - tipi di dato: [Inductive nat := O | S (n : nat)]
+ - pattern matching: [match x with O => .. | S p => ..]
+ - ricorsione: [Fixpoint addn n m := ...]
+ - polymorfismo: [Inductive pair (A B : Type) := ..]
+ - argomenti impliciti: [Check pair 2 3]
 
  #</div># *)
 (** -------------------------------------------- *)
