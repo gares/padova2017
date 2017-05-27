@@ -19,7 +19,7 @@ coq/bin/coqide:
 %.html : %.v Makefile
 	./coq/bin/coqc $* # if not working, no links but html still ok
 	./udoc/udoc.byte $< -o $@
-	sed -i 's?^ *<title.*?<title>$*</title>?' $@
+	sed -i "s#^ *<title.*#<title>$*</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' } }); </script>#" $@
 	sed -i 's?^ *<h1>$*</h1>??' $@
 	sed -i '/<\/title>/a\<link rel="stylesheet" href="local.css" />' $@
 

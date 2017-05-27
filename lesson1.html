@@ -5,7 +5,7 @@
 
     <link rel="stylesheet" href="jscoq/ui-external/bootstrap.min.css" />
 
-<title>lesson1</title>
+<title>lesson1</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' } }); </script>
 <link rel="stylesheet" href="local.css" />
   </head>
 
@@ -19,13 +19,16 @@
 <div><p>
 <div class='slide vfill'> 
 <h1>
- The Coq Proof Assistant
+ L'assistente alla dimostrazione Coq
 </h1>
 
 <p>
 <center><img src="https://coq.inria.fr/files/barron_logo.png"/></center>
 <p>
 <a href="https://coq.inria.fr/">Sito web di Coq</a>
+<p>
+<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/">Sito web del mini corso</a>
+http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/
 <p>
 </div> <p>
 <hr/>
@@ -37,14 +40,26 @@
 
 <p>
 <ul class="doclist">
-  <li> Coq è basato sulla (una variante) dell teoria dei
-   tipi di Martin Löf
+  <li> Cos'è un assistente alla dimostrazione?!
 
   </li>
-<li> Coq è ...
+<li> Coq è basato sulla (una variante) dell teoria dei
+   tipi di Martin Löf
+
+</li>
+<li> Coq è utilizzato per
+<ul class="doclist">
+  <li> formalizzare matematica
+
+  </li>
+<li> verificare software
 
 </li>
 </ul>
+
+</li>
+</ul>
+<p>
 </div> <p>
 <hr/>
  <p>
@@ -55,10 +70,17 @@
 
 <p>
 <ul class="doclist">
-  <li> 
+  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/">Enrico Tassi</a>
 
   </li>
+<li> Sviluppatore Coq
+
+</li>
+<li> Ricercatore (implementazione PA e loro utilizzo)
+
+</li>
 </ul>
+<p>
 </div> <p>
 <hr/>
  <p>
@@ -69,89 +91,471 @@
 
 <p>
 <ul class="doclist">
-  <li> 
-<p>
-  
+  <li> Vedere una applicazione pratica della teoria dei tipi
+
   </li>
-<li> 
+<li> Introduzione a un assistente alla dimostrazione
+    (proof assistant, interactive theorem prover)
 
 </li>
 </ul>
-<p>
-<a target='_blank' href="http://math-comp.github.io/mcb">Mathematical Components (the book)</a>
 <p>
 </div>
 <hr/>
  <p>
  <div class='slide vfill'>  
 <h2>
- Propaganda
+ Piano di battaglia
 </h2>
 
 <p>
 <ul class="doclist">
-  <li> For Isabelle users: it is like HOL
+  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson1.html">lezione 1</a>: il linguaggio dei programmi
 
   </li>
-<li> For Coq users: it is simpler
+<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson2.html">lezione 2</a>: il linguaggio della logica
 
 </li>
-<li> For newcomers: it works
+<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson3.html">lezione 3</a>: dimostrazioni per induzione
+
+</li>
+<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson4.html">lezione 4</a>: il calcolo e la riflessione
 
 </li>
 </ul>
+<p>
 </div> <p>
 <hr/>
  <p>
  <div class='slide vfill'>  
 <h2>
- Lesson 1 (of 4)
+ Lezione 1
 </h2>
 
 <p>
 <ul class="doclist">
-  <li> Boolean reflection
-
-  </li>
-<li> Tactic language
-
-</li>
-</ul>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'>  
-<h2>
- Boolean reflection in a nutshell
-</h2>
-
-<p>
+  <li> Programmazione in Coq
 <ul class="doclist">
-  <li> Bool datatype to represent mere propositions
+    <li> funzioni anonime e non
+
+    </li>
+  <li> calcolo
 
   </li>
-<li> Symbolic computation is a predictable, pervasive,
-   form of automation
+  <li> tipi di dato algebrici
+
+  </li>
+  <li> pattern matching
+
+  </li>
+  <li> ricorsione
+
+  </li>
+  <li> tipi di dato polimorfi
+
+  </li>
+  <li> ordine superiore
+<p>
+  
+  </li>
+  </ul>
+  
+  </li>
+<li> Esercizi
 
 </li>
 </ul>
+<p>
 </div> <p>
 <hr/>
  <p>
  <div class='slide'> 
 <h2>
- The emblematic example
+ Funzioni
 </h2>
 
 <p>
-to say: .+1 , lt , = true , = mean equiv , by  , elim , apply , rewrite
+<ul class="doclist">
+  <li> Nota: anche se nat, + e 1 sono concetti definibili
+  in Coq, l'ambiente iniziale non è vuoto ma contiene
+  alcuni declarazioni (come i numeri naturali) utili
+  a fare esempi
+
+  </li>
+</ul>
+$$ 
+f = x \mapsto x + 1
+$$
+$$
+f : \mathcal{N} \to \mathcal{N}
+$$
 <p>
 </div>
 <div><textarea id='coq-ta-2'>
 
-Module Leq.
+Check (fun (x : nat) => x + 1).
 
-End Leq.
+Definition f (x : nat) : nat :=
+  x + 1.
+
+Definition g (x : nat) (y : nat) : nat :=
+  f x * y.
+
+</textarea></div>
+<div><p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Calcolo
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> Prendiamo la funzione (il programma) f definito
+   in precedenza
+
+  </li>
+</ul>
+$$ 
+f = x \mapsto x + 1 : \mathcal{N} \to \mathcal{N}
+$$
+<pre>
+Definition f (x : nat) : nat :=
+  x + 1 .
+</pre>
+<p>
+<ul class="doclist">
+  <li> Chiediamo a Coq di calcolare la forma canonica
+   dei termini seguenti
+
+  </li>
+</ul>
+</div>
+<div><textarea id='coq-ta-3'>
+
+Eval compute in 3 + 1.
+
+Eval compute in (fun x => x + 1) 3.
+
+Eval compute in f 3.
+
+Eval compute in g 3 4.
+
+</textarea></div>
+<div><p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Tipi di dato algebrici
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> Facciamo finta che i numeri naturali
+   che abbiamo usato finora non sia disponibili
+   e definiamoli noi
+
+  </li>
+</ul>
+</div>
+<div><textarea id='coq-ta-4'>
+
+Module ProvaBoolNat.
+
+Inductive Bool := True | False.
+
+</textarea></div>
+<div><p>
+True e False si chiamano costruttori, e
+    corrispondono alle regole $$Tipo-I_n$$
+    nelle note del corso </div>
+<div><textarea id='coq-ta-5'>
+
+Check True.
+
+Inductive Nat := Zero | Succ (n : Nat).
+
+Check Zero.
+Check Succ.
+
+Check (Succ Zero).
+
+</textarea></div>
+<div><p>
+Nota: esistono varie sintassi alternative,
+    per esempio
+<pre>
+Inductive Nat :=
+   Zero : Nat
+ | Succ : Nat -> Nat.
+</pre>
+<p>
+  Quella che abbiamo utilizzata è la più simile a quella
+  usata nelle note del corso e anche nei linguaggi di
+  programmazione.  Se chiediamo a Coq di stampare una
+  dichiarazione di tipo con:
+<p>
+</div>
+<div><textarea id='coq-ta-6'>
+
+Print Nat.
+
+End ProvaBoolNat.
+
+</textarea></div>
+<div><p>
+utilizzerà l'altra sintassi...
+<p>
+    Ora torniamo a utilizzare <em>nat</em> (in minuscolo)
+    e i suoi costruttori <em>S</em> e <em>O</em> (lettera O maiuscola)
+    in quanto il sistema li stampa meglio (notazione decimale).
+</div>
+<div><textarea id='coq-ta-7'>
+
+Print nat.
+Check (S O).
+Set Printing All.
+Check (S O).
+Unset Printing All.
+Check (S O).
+
+</textarea></div>
+<div><p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Pattern matching
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> In Coq l'eliminatore (chiamato <em>El</em> nelle note
+   del corso) è fornito in <em>kit</em>:
+<ul class="doclist">
+    <li> il costrutto <em>match</em> fornisce l'analisi per casi
+
+    </li>
+  <li> il costrutto <em>Fixpoint</em> (in seguito) fornisce
+     l'ipotesi induttiva
+
+  </li>
+  </ul>
+  
+  </li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-8'>
+
+Definition notb (b : bool) :=
+  match b with
+  | true => false
+  | false => true
+  end.
+
+Eval compute in notb true.
+Eval compute in notb false.
+
+Definition andb (b1 : bool) (b2 : bool) :=
+  match b1 with
+  | true => b2
+  | false => false
+  end.
+
+Eval compute in andb true true.
+Eval compute in andb true false.
+
+Definition predecessore (n : nat) : nat :=
+  match n with
+  | O => O
+  | S p => p
+  end.
+
+</textarea></div>
+<div><p>
+<p>
+  Note:
+<p>
+<ul class="doclist">
+  <li> Ogni clausola del pattern matching è della forma
+    <tt>| pattern => corpo </tt><p>
+      dove pattern è un costruttore applicato a un numero
+    di variabili appropriato
+<p>
+  
+  </li>
+<li> Tutti i costruttori del tipo di dato devono essere
+    trattati da un pattern
+
+</li>
+<li> <em>p</em> è una variabile legata dal pattern matching
+    e può essere utilizzata nel corpo della clausola
+
+</li>
+</ul>
+  Esempio di esecuzione:
+ <tt>
+   match S (S O) with
+   | O => O
+   | S p => p
+   end
+
+   O    ==?== S (S O)  no, proviamo la prossima clausola
+   S p  ==?== S (S O)  sì, p lega (S O)
+ </tt><p>
+<p>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Ricorsione
+</h2>
+
+</div>
+<div><textarea id='coq-ta-9'>
+
+Fixpoint addn (n : nat) (m : nat) : nat :=
+  match n with
+  | O => m  (* 0 + m = m *)
+  | S p => S (addn p m)   (* S p + m = S (p + m) *)
+  end.
+
+Eval compute in addn 2 4.
+
+</textarea></div>
+<div><p>
+Esempio di esecuzione:
+<pre>
+  addn 2 4
+  addn (S (S O)) 4
+  S (addn (S O) 4)
+  S (S (addn O 4))
+  S (S 4)
+  6
+</pre>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Tipi di dato polimorfi
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> La coppia (a,b) dove a : A e b : B
+
+  </li>
+<li> La list x1 :: .. :: xn dove x_i : A
+
+</li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-10'>
+
+Inductive prod (A : Type) (B : Type) :=
+  | pair (a : A) (b : B).
+
+Check prod.
+Check prod nat bool.
+Check pair.
+
+</textarea></div>
+<div><p>
+Nota: forall A B : Type, ci indica che il tipo
+    pair è polimorfo, ovvero A e B possono essere rimpiazzati per
+    un tipo di data </div>
+<div><textarea id='coq-ta-11'>
+
+Check pair nat bool.
+Check pair nat bool 3 false.
+
+</textarea></div>
+<div><p>
+Nota: come assegnare il tipo a una applicazione
+<pre>
+      addn : nat -> nat -> nat
+      addn 3 : nat -> nat
+      addn 3 4 : nat
+</pre>
+    Se il tipo è quantificato, allora il valore
+    dell'argomento sostituisce la variabile in ciò
+    che rimane
+<pre>
+      pair : forall A, forall B, A -> B -> prod A B
+      pair nat : forall B, nat -> B -> prod nat B
+      pair nat bool : nat -> bool -> prod nat bool
+      pair nat bool 3 : bool -> prod nat bool
+      pair nat bool 3 false : prod nat bool
+</pre>
+</div>
+<div><textarea id='coq-ta-12'>
+
+Definition fst (A : Type) (B : Type) (x : prod A B) : A :=
+  match x with
+  | pair _ _ x1 x2 => x1
+  end.
+
+Eval compute in fst nat bool (pair nat bool 3 false).
+
+</textarea></div>
+<div><p>
+Argomenti impliciti (inferiti da Coq) </div>
+<div><textarea id='coq-ta-13'>
+
+Check pair _ _ 3 false.
+Eval compute in fst _ _ (pair _ _ 3 false).
+
+Arguments pair {_ _} a b.
+Arguments fst {_ _} x.
+
+Check pair 3 false.
+Eval compute in fst (pair 3 false).
+
+Definition snd (A : Type) (B : Type) (x : prod A B) : B :=
+  match x with
+  | pair x1 x2 => x2
+  end.
+
+</textarea></div>
+<div><p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Liste
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-14'>
+
+Inductive list (A : Type) :=
+  nil | cons (a : A) (tl : list A).
+
+Arguments nil {_}.
+Arguments cons {_} a tl.
+
+Fixpoint length A (l : list A) : nat :=
+  match l with
+  | nil => 0
+  | cons x xs => S (length A xs)
+  end.
+
+Arguments length {_} l.
+
+Eval compute in length (cons 3 (cons 4 nil)).
 
 </textarea></div>
 <div><p>
@@ -165,74 +569,20 @@ End Leq.
 
 <p>
 <ul class="doclist">
-  <li> logic of Coq
-<ul class="doclist">
-    <li> lets you express programs
-
-    </li>
-  <li> Coq knows hot compute them
+  <li> ....
 
   </li>
-  <li> their execution is a legit form of proof
-<p>
-  
-  </li>
-  </ul>
-  
-  </li>
-<li> boolean predicates
-<ul class="doclist">
-  <li> symbolic computation at hand
-
-  </li>
-<li> EM at hand
-
-</li>
-<li> ... UIP at hand ...
-<p>
-
-</li>
-</ul>
-
-</li>
-<li> proof language
-<ul class="doclist">
-  <li> small bricks
-
-  </li>
-<li> compose well
-
-</li>
-<li> squeezing video game quite addictive ;-)
-
-</li>
-</ul>
-
-</li>
 </ul>
  </div> <hr/>
  <p>
  <div class='slide'>
 <h2>
- Exercises
+ Esercizi
 </h2>
 
 <p>
-<ul class="doclist">
-  <li> Hint1: Search results can be limited to the ssrnat module as in 
-	  <tt>Search _ something in ssrnat.</tt>  All the lemmas you
-	  are looking for live in there. 
-<p>
-  
-  </li>
-<li> Hint2: removing an hypothesis named <tt>Hyp</tt> from the context
-           can be done with <tt>move=> {Hyp}</tt>.
-
-</li>
-</ul>
-<p>
 </div>
-<div><textarea id='coq-ta-3'>
+<div><textarea id='coq-ta-15'>
 
 Module Exercises.
 
@@ -258,14 +608,14 @@ by case: (odd m).
 </div>
 
 </div>
-<div><textarea id='coq-ta-4'>
+<div><textarea id='coq-ta-16'>
 
 End Exercises.
 
 </textarea></div>
 <div><p>
 </div> </div>
-<div><textarea id='coq-ta-5'>
+<div><textarea id='coq-ta-17'>
 
 (* ------------------------------------------------------ *)
 
@@ -365,11 +715,14 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-6'>
+<div><textarea id='coq-ta-18'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
-                  'coq-ta-5',  'coq-ta-6'];
+                  'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
+                  'coq-ta-9',  'coq-ta-10',  'coq-ta-11',  'coq-ta-12', 
+                  'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16', 
+                  'coq-ta-17',  'coq-ta-18'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->
