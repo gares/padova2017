@@ -17,9 +17,10 @@ coq/bin/coqide:
 
 
 %.html : %.v Makefile
-	./coq/bin/coqc $* # if not working, no links but html still ok
-	./udoc/udoc.byte $< -o $@
-	sed -i "s#^ *<title.*#<title>$*</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' } }); </script>#" $@
+	./coq/bin/coqc $*
+	bash -c "./udoc/udoc.byte <( sed 's/^(\*D\*).*/(* completa... *)/' $< ) -o $@"
+	sed -i "s#^ *<title.*#<title>$*</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>#" $@
+	#sed -i "s#^ *<title.*#<title>$*</title><script type='text/javascript' src='MathJax-2.7.1/unpacked/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>#" $@
 	sed -i 's?^ *<h1>$*</h1>??' $@
 	sed -i '/<\/title>/a\<link rel="stylesheet" href="local.css" />' $@
 
@@ -30,3 +31,5 @@ deploy: jscoq
 
 run-local:
 	python3 -m http.server 8000
+
+

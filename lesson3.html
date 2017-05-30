@@ -5,7 +5,7 @@
 
     <link rel="stylesheet" href="jscoq/ui-external/bootstrap.min.css" />
 
-<title>index</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
+<title>lesson3</title><script type='text/javascript' src='MathJax-2.7.1/unpacked/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
 <link rel="stylesheet" href="local.css" />
   </head>
 
@@ -15,168 +15,25 @@
   <div id="document">
 
 <div><textarea id='coq-ta-1'>
-</textarea></div>
-<div><p>
-<div class='slide >
-<p>
-<h1>
- L'assistente alla dimostrazione Coq
-</h1>
 
-<p>
-<center><img src="https://coq.inria.fr/files/barron_logo.png"/></center>
-<p>
-<a href="https://coq.inria.fr/">Sito web di Coq</a>
-<p>
-<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/">Sito web del mini corso</a>
-http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/
-<p>
-<h2>
- Pagina di prova
-</h2>
+From mathcomp Require Import ssreflect.
+Require Import lesson1.
+Require Import lesson2.
 
-<p>
- Coq può funzionare dentro il browser (navigatore).
-<p>
-<ul class="doclist">
-  <li> attendi che la pagina si carichi, un pannello si apre sulla destra
+Lemma addnC a b : a + b = b + a.
+Admitted.
 
-  </li>
-<li> verifica con Coq ogni linea del documento premendo ALT-N (le frasi
-   accettate da Coq diventano grigio chiaro).
+Lemma addnA a b c : a + (b + c) = a + b + c.
+Admitted.
 
-</li>
-<li> torna indietro con ALT-P
+Lemma add0n n : 0 + n = n.
+Admitted.
 
-</li>
-<li> OK, tutto funziona!
-
-</li>
-</ul>
-<p>
-</div>
-<div><textarea id='coq-ta-2'>
-
-Lemma test : 2 + 1 = 3.
-Proof.
-trivial.
-Qed.
+Lemma addn0 n : n + 0 = n.
+Admitted.
 
 </textarea></div>
 <div><p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h1>
- Introduzione
-</h1>
-
-<p>
-<h2>
- Coq: un assistente alla dimostrazione
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> Cos'è un assistente alla dimostrazione?!
-
-  </li>
-<li> Coq è basato sulla (una variante) della teoria dei
-   tipi di Martin Löf
-
-</li>
-<li> Coq è utilizzato per
-<ul class="doclist">
-  <li> formalizzare matematica
-
-  </li>
-<li> verificare software
-
-</li>
-</ul>
-
-</li>
-</ul>
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Chi sono io?
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/">Enrico Tassi</a>
-
-  </li>
-<li> Sviluppatore Coq
-
-</li>
-<li> Ricercatore (implementazione PA e loro utilizzo)
-
-</li>
-</ul>
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Obiettivi del mini corso
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> Vedere una applicazione pratica della teoria dei tipi
-
-  </li>
-<li> Introduzione a un assistente alla dimostrazione
-    (proof assistant, interactive theorem prover)
-
-</li>
-</ul>
-<p>
-</div>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Lezioni
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson1.html">lezione 1</a>: Coq: un linguaggio di programmazione funzionale
-
-  </li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson2.html">lezione 2</a>: Curry Howard: la logica di Coq e le prime dimostrazioni
-
-</li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson3.html">lezione 3</a>: Induzione: proprietà di programmi ricorsivi
-
-</li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson4.html">lezione 4</a>: Riflessione computazionale: l'esecusione di un programma è una prova
-
-</li>
-</ul>
-<p>
-</div>
-<hr/>
- <p>
- <div class='slide vfill'>  
-<h2>
- Iniziamo!
-</h2>
-
-<p>
- <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson1.html">Prima lezione</a>:
-   Coq: un linguaggio di programmazione funzionale
-<p>
-</div> <p>
-<p>
 
 <script>
 alignWithTop = true;
@@ -271,10 +128,10 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-3'>
+<div><textarea id='coq-ta-2'>
 </textarea></div>
 <script type="text/javascript">
- var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3'];
+ var coqdoc_ids = ['coq-ta-1',  'coq-ta-2'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->

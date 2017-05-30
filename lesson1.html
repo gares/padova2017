@@ -5,7 +5,7 @@
 
     <link rel="stylesheet" href="jscoq/ui-external/bootstrap.min.css" />
 
-<title>lesson1</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' } }); </script>
+<title>lesson1</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
 <link rel="stylesheet" href="local.css" />
   </head>
 
@@ -17,129 +17,19 @@
 <div><textarea id='coq-ta-1'>
 </textarea></div>
 <div><p>
-<div class='slide vfill'> 
-<h1>
- L'assistente alla dimostrazione Coq
-</h1>
-
-<p>
-<center><img src="https://coq.inria.fr/files/barron_logo.png"/></center>
-<p>
-<a href="https://coq.inria.fr/">Sito web di Coq</a>
-<p>
-<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/">Sito web del mini corso</a>
-http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Coq: un assistente alla dimostrazione
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> Cos'è un assistente alla dimostrazione?!
-
-  </li>
-<li> Coq è basato sulla (una variante) dell teoria dei
-   tipi di Martin Löf
-
-</li>
-<li> Coq è utilizzato per
-<ul class="doclist">
-  <li> formalizzare matematica
-
-  </li>
-<li> verificare software
-
-</li>
-</ul>
-
-</li>
-</ul>
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Chi sono io?
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/">Enrico Tassi</a>
-
-  </li>
-<li> Sviluppatore Coq
-
-</li>
-<li> Ricercatore (implementazione PA e loro utilizzo)
-
-</li>
-</ul>
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'> 
-<h2>
- Obiettivi del mini corso
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> Vedere una applicazione pratica della teoria dei tipi
-
-  </li>
-<li> Introduzione a un assistente alla dimostrazione
-    (proof assistant, interactive theorem prover)
-
-</li>
-</ul>
-<p>
-</div>
-<hr/>
- <p>
- <div class='slide vfill'>  
-<h2>
- Piano di battaglia
-</h2>
-
-<p>
-<ul class="doclist">
-  <li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson1.html">lezione 1</a>: il linguaggio dei programmi
-
-  </li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson2.html">lezione 2</a>: il linguaggio della logica
-
-</li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson3.html">lezione 3</a>: dimostrazioni per induzione
-
-</li>
-<li> <a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson4.html">lezione 4</a>: il calcolo e la riflessione
-
-</li>
-</ul>
-<p>
-</div> <p>
-<hr/>
- <p>
- <div class='slide vfill'>  
+<div class='slide vfill'>  
 <h2>
  Lezione 1
 </h2>
 
 <p>
 <ul class="doclist">
-  <li> Programmazione in Coq
+  <li> Coq: un linguaggio di programmazione funzionale
 <ul class="doclist">
     <li> funzioni anonime e non
 
     </li>
-  <li> calcolo
+  <li> valutazione di funzioni
 
   </li>
   <li> tipi di dato algebrici
@@ -155,6 +45,9 @@ http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/
 
   </li>
   <li> ordine superiore
+
+  </li>
+  <li> calcolo simbolico
 <p>
   
   </li>
@@ -175,20 +68,17 @@ http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/
 </h2>
 
 <p>
-<ul class="doclist">
-  <li> Nota: anche se nat, + e 1 sono concetti definibili
-  in Coq, l'ambiente iniziale non è vuoto ma contiene
-  alcuni declarazioni (come i numeri naturali) utili
-  a fare esempi
-
-  </li>
-</ul>
+Prendiamo come esempio la definizione di una
+semplice funzione aritmetica <tt>f</tt>:
+<p>
 $$ 
 f = x \mapsto x + 1
 $$
 $$
 f : \mathcal{N} \to \mathcal{N}
 $$
+<p>
+e traduciamola in Coq.
 <p>
 </div>
 <div><textarea id='coq-ta-2'>
@@ -203,48 +93,77 @@ Definition g (x : nat) (y : nat) : nat :=
 
 </textarea></div>
 <div><p>
+<p>
+ Nota: anche se <tt>nat</tt>, <tt>+</tt>, <tt>*</tt> e <tt>1</tt> sono concetti definibili
+  in Coq, l'ambiente iniziale non è vuoto ma contiene
+  alcuni declarazioni utili a fare esempi
+<p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> funzione anonima <tt>fun</tt>
+
+  </li>
+<li> definizione con nome <tt>Definition</tt>
+
+</li>
+<li> sintassi per l'applicazione
+
+</li>
+<li> comando <tt>Check</tt> per chiedere il tipo di un termine
+
+</li>
+</ul>
+ </div>
+<p>
 </div> <p>
 <hr/>
  <p>
  <div class='slide'> 
 <h2>
- Calcolo
+ Valutazione di funzioni (calcolo, esecuzione)
 </h2>
 
 <p>
-<ul class="doclist">
-  <li> Prendiamo la funzione (il programma) f definito
-   in precedenza
-
-  </li>
-</ul>
-$$ 
-f = x \mapsto x + 1 : \mathcal{N} \to \mathcal{N}
-$$
-<pre>
-Definition f (x : nat) : nat :=
-  x + 1 .
-</pre>
+  In Coq funzione = programma, ovvero le funzioni
+  definite vengono calcolate (eseguite) quando il
+  loro input è noto.
 <p>
-<ul class="doclist">
-  <li> Chiediamo a Coq di calcolare la forma canonica
-   dei termini seguenti
-
-  </li>
-</ul>
+  Chiediamo a Coq di calcolare <em>la forma canonica</em>
+  dei termini seguenti:
 </div>
 <div><textarea id='coq-ta-3'>
 
 Eval compute in 3 + 1.
 
+</textarea></div>
+<div><p>
+Esempio di XXX\betaXXX-riduzione (sostituzione di x
+    con l'argomento) </div>
+<div><textarea id='coq-ta-4'>
 Eval compute in (fun x => x + 1) 3.
 
+</textarea></div>
+<div><p>
+In questi due esempi f e g (nomi) sono sostituiti con i
+    propri valori  </div>
+<div><textarea id='coq-ta-5'>
 Eval compute in f 3.
 
 Eval compute in g 3 4.
 
 </textarea></div>
 <div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> esecuzione di programmi <tt>Eval compute in</tt>
+
+  </li>
+</ul>
+ </div>
 </div> <p>
 <hr/>
  <p>
@@ -254,15 +173,14 @@ Eval compute in g 3 4.
 </h2>
 
 <p>
-<ul class="doclist">
-  <li> Facciamo finta che i numeri naturali
-   che abbiamo usato finora non sia disponibili
-   e definiamoli noi
-
-  </li>
-</ul>
+ Facciamo finta che i numeri naturali
+ che abbiamo usato finora non siano disponibili
+ e definiamoli noi.  Lo facciamo dentro un <tt>Module</tt>,
+ una specie di contenitore per evitare che Coq faccia
+ confusione tra
+ i concetti già esistenti e quelli che stiamo definendo.
 </div>
-<div><textarea id='coq-ta-4'>
+<div><textarea id='coq-ta-6'>
 
 Module ProvaBoolNat.
 
@@ -271,9 +189,9 @@ Inductive bool := true | false.
 </textarea></div>
 <div><p>
 true e false si chiamano costruttori, e
-    corrispondono alle regole $$Tipo-I_n$$
+    corrispondono alle regole XXXTipo-I_nXXX
     nelle note del corso </div>
-<div><textarea id='coq-ta-5'>
+<div><textarea id='coq-ta-7'>
 
 Check true.
 
@@ -282,7 +200,7 @@ Check true.
 I numeri naturali à la Peano
 <p>
     Nota: <em>O</em> è una o maiuscola, non la cifra zero </div>
-<div><textarea id='coq-ta-6'>
+<div><textarea id='coq-ta-8'>
 Inductive nat := O | S (n : nat).
 
 Check O.
@@ -295,34 +213,30 @@ Check (S O).
 Nota: esistono varie sintassi alternative per
     la dichiarazione di tipi di dato.
 <p>
-  Quella che abbiamo utilizzata è la più simile a quella
+  Quella che abbiamo utilizzato è la più simile a quella
   usata nelle note del corso e anche nei linguaggi di
   programmazione.  Se chiediamo a Coq di stampare una
   dichiarazione di tipo con:
 <p>
 </div>
-<div><textarea id='coq-ta-7'>
+<div><textarea id='coq-ta-9'>
 
 Print nat.
 
 </textarea></div>
 <div><p>
-<pre>
-Inductive nat :=
-   O : nat
- | S : nat -> nat.
-</pre>
-</div>
-<div><textarea id='coq-ta-8'>
+Ottenia la stampa in una sintassi alternativa </div>
+<div><textarea id='coq-ta-10'>
 
 End ProvaBoolNat.
 
 </textarea></div>
 <div><p>
 Ora torniamo a utilizzare la dichiarazione standard di
-    <em>nat</em> in quanto il sistema li stampa meglio (notazione decimale).
+    <em>nat</em> in quanto il sistema li stampa/parsa meglio
+   (notazione decimale).
 </div>
-<div><textarea id='coq-ta-9'>
+<div><textarea id='coq-ta-11'>
 
 Print nat.
 Check (S O).
@@ -333,6 +247,23 @@ Check (S O).
 
 </textarea></div>
 <div><p>
+<p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> dichiarazione tipo induttivo <tt>Inductive</tt>
+
+  </li>
+<li> comando per stampare una dichiarazione induttiva <tt>Print</tt>
+
+</li>
+<li> notazioni decimali per <tt>nat</tt>, e.g. <tt>1 = S O</tt>
+
+</li>
+</ul>
+ </div>
+<p>
 </div> <p>
 <hr/>
  <p>
@@ -343,14 +274,14 @@ Check (S O).
 
 <p>
 <ul class="doclist">
-  <li> In Coq l'eliminatore (chiamato <em>El</em> nelle note
+  <li> In Coq l'eliminatore (chiamato XXXElXXX nelle note
    del corso) è fornito in <em>kit</em>:
 <ul class="doclist">
-    <li> il costrutto <em>match</em> fornisce l'analisi per casi
+    <li> il costrutto <tt>match</tt> fornisce l'analisi per casi
 
     </li>
-  <li> il costrutto <em>Fixpoint</em> (in seguito) fornisce
-     l'ipotesi induttiva
+  <li> il costrutto <tt>Fixpoint</tt> (in seguito) fornisce
+     ``l'ipotesi induttiva''
 
   </li>
   </ul>
@@ -359,7 +290,7 @@ Check (S O).
 </ul>
 <p>
 </div>
-<div><textarea id='coq-ta-10'>
+<div><textarea id='coq-ta-12'>
 
 Definition notb (b : bool) :=
   match b with
@@ -379,11 +310,19 @@ Definition andb (b1 : bool) (b2 : bool) :=
 Eval compute in andb true true.
 Eval compute in andb true false.
 
-Definition predecessore (n : nat) : nat :=
+</textarea></div>
+<div><p>
+Definiamo ora il predecessore </div>
+<div><textarea id='coq-ta-13'>
+
+Definition pred (n : nat) : nat :=
   match n with
   | O => O
   | S p => p
   end.
+
+Eval compute in pred 3.
+Eval compute in pred O.
 
 </textarea></div>
 <div><p>
@@ -392,14 +331,13 @@ Definition predecessore (n : nat) : nat :=
 <p>
 <ul class="doclist">
   <li> Ogni clausola del pattern matching è della forma
-    <tt>| pattern => corpo </tt><p>
-      dove pattern è un costruttore applicato a un numero
+    <tt>| pattern => corpo</tt>
+    dove pattern è un costruttore applicato a un numero
     di variabili appropriato
-<p>
-  
+
   </li>
 <li> Tutti i costruttori del tipo di dato devono essere
-    trattati da un pattern
+    trattati da un pattern (eg anche il caso <tt>O</tt> per <tt>pred</tt>)
 
 </li>
 <li> <em>p</em> è una variabile legata dal pattern matching
@@ -407,8 +345,9 @@ Definition predecessore (n : nat) : nat :=
 
 </li>
 </ul>
+<p>
   Esempio di esecuzione:
- <tt>
+<pre>
    match S (S O) with
    | O => O
    | S p => p
@@ -416,8 +355,37 @@ Definition predecessore (n : nat) : nat :=
 
    O    ==?== S (S O)  no, proviamo la prossima clausola
    S p  ==?== S (S O)  sì, p lega (S O)
- </tt><p>
+</pre>
 <p>
+ Il termine a cui il <tt>math</tt> è applicato vienre
+    messo in forma canonica. In altre parole i casi del
+    <tt>match</tt> parlano della forma canonica </div>
+<div><textarea id='coq-ta-14'>
+Eval compute in
+  match 2 + 1 with
+  | O => O
+  | S m => m
+  (* non è un caso "A + B" e via dicendo *)
+  end.
+
+</textarea></div>
+<div><p>
+<p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> pattern matching <tt>match .. with .. end</tt>
+
+  </li>
+<li> forma delle clausole <tt>K x => v</tt> dove <tt>K</tt> è un costruttore
+
+</li>
+<li> calcolo di una funzione definita via pattern matching
+
+</li>
+</ul>
+ </div>
 <p>
 </div> <p>
 <hr/>
@@ -427,8 +395,11 @@ Definition predecessore (n : nat) : nat :=
  Ricorsione
 </h2>
 
+<p>
+Definiamo l'addizione sui numeri naturali.
+<p>
 </div>
-<div><textarea id='coq-ta-11'>
+<div><textarea id='coq-ta-15'>
 
 Fixpoint addn (n : nat) (m : nat) : nat :=
   match n with
@@ -442,13 +413,35 @@ Eval compute in addn 2 4.
 <div><p>
 Esempio di esecuzione:
 <pre>
-  addn 2 4
+  addn 2 
   addn (S (S O)) 4
   S (addn (S O) 4)
   S (S (addn O 4))
   S (S 4)
   6
 </pre>
+<p>
+Non tutti i programmi sono accettati! </div>
+<div><textarea id='coq-ta-16'>
+
+Fail
+  Fixpoint loop (n : nat) : bool := loop n.
+
+</textarea></div>
+<div><p>
+<p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> programmi ricorsivi <tt>Fixpoint</tt>
+
+  </li>
+<li> terminazione
+
+</li>
+</ul>
+ </div>
 <p>
 </div> <p>
 <hr/>
@@ -459,17 +452,22 @@ Esempio di esecuzione:
 </h2>
 
 <p>
+ I tipi di dato polimorfi sono, in genere, dei contenitori
+ per aggregare vari termini e che vogliamo riutilizzare.
+<p>
+ Esempi classici:
+<p>
 <ul class="doclist">
-  <li> La coppia (a,b) dove a : A e b : B
+  <li> La coppia XXX(a,b)XXX dove XXXa : AXXX e XXXb : BXXX
 
   </li>
-<li> La lista x1 :: .. :: xn dove x_i : A
+<li> La lista XXXx_1 :: .. :: x_nXXX dove XXXx_i : AXXX
 
 </li>
 </ul>
 <p>
 </div>
-<div><textarea id='coq-ta-12'>
+<div><textarea id='coq-ta-17'>
 
 Inductive prod (A : Type) (B : Type) :=
   | pair (a : A) (b : B).
@@ -480,17 +478,18 @@ Check pair.
 
 </textarea></div>
 <div><p>
-Nota: forall A B : Type, ci indica che il tipo
-    pair è polimorfo, ovvero A e B possono essere rimpiazzati per
-    un tipo di data </div>
-<div><textarea id='coq-ta-13'>
+<tt>forall A B : Type</tt>, ci indica che <tt>pair</tt> è polimorfo,
+    ovvero A e B possono essere rimpiazzati per tipi di dato
+    a piacere </div>
+<div><textarea id='coq-ta-18'>
 
 Check pair nat bool.
 Check pair nat bool 3 false.
+Check pair nat nat 4 5.
 
 </textarea></div>
 <div><p>
-Nota: come assegnare il tipo a una applicazione
+Come assegnare il tipo a una applicazione
 <pre>
       addn : nat -> nat -> nat
       addn 3 : nat -> nat
@@ -507,7 +506,7 @@ Nota: come assegnare il tipo a una applicazione
       pair nat bool 3 false : prod nat bool
 </pre>
 </div>
-<div><textarea id='coq-ta-14'>
+<div><textarea id='coq-ta-19'>
 
 Definition fst (A : Type) (B : Type) (x : prod A B) : A :=
   match x with
@@ -518,8 +517,38 @@ Eval compute in fst nat bool (pair nat bool 3 false).
 
 </textarea></div>
 <div><p>
-Argomenti impliciti (inferiti da Coq) </div>
-<div><textarea id='coq-ta-15'>
+<p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> polimorfismo e quantificazione <tt>forall A : Type</tt>
+
+  </li>
+<li> tipaggio dell'applicazione in presenza di <tt>forall</tt>
+
+</li>
+<li> pattern matching e parametri di tipo
+
+</li>
+</ul>
+ </div>
+<p>
+</slide> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Argomenti impliciti (inferiti da Coq)
+</h2>
+
+<p>
+  I termini costruiti in precedenza, come
+   <tt>pair nat bool 3 false</tt>
+  sono molto verbosi e contengono informazione ridondante.
+<p>
+</div>
+<div><textarea id='coq-ta-20'>
 
 Check pair _ _ 3 false.
 Eval compute in fst _ _ (pair _ _ 3 false).
@@ -537,17 +566,27 @@ Definition snd (A : Type) (B : Type) (x : prod A B) : B :=
 
 </textarea></div>
 <div><p>
+<p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> argomenti impliciti (inferenza)
+
+  </li>
+</ul>
+ </div>
 </div> <p>
 <hr/>
  <p>
  <div class='slide'> 
 <h2>
- Liste
+ Liste (omogenee) e notazione
 </h2>
 
 <p>
 </div>
-<div><textarea id='coq-ta-16'>
+<div><textarea id='coq-ta-21'>
 
 Inductive list (A : Type) :=
   nil | cons (a : A) (tl : list A).
@@ -565,8 +604,126 @@ Arguments length {_} l.
 
 Eval compute in length (cons 3 (cons 4 nil)).
 
+Infix "::" := cons.
+
+Check 2 :: 3 :: nil.
+Set Printing All.
+Check 2 :: 3 :: nil.
+Unset Printing All.
+
+Fixpoint rcons {A} (l : list A) (a : A) : list A :=
+  match l with
+  | nil => a :: nil
+  | x :: xs => x :: rcons xs a
+  end.
+
+Eval compute in rcons (1 :: 2 :: nil) 3.
+
+Notation "a + b" := (addn a b) : nat_scope.
+
 </textarea></div>
 <div><p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> liste
+
+  </li>
+<li> notazioni infisse
+
+</li>
+<li> parametri tra <tt>{}</tt> sono impliciti
+ </div>
+<p>
+ </div> 
+</li>
+</ul>
+<p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Ordine superiore e calcolo simbolico
+</h2>
+
+<p>
+  Le funzione possono essere passate ad altre funzioni
+  come argumenti
+<p>
+  iter f 3 x = f (f (f x))
+<p>
+</div>
+<div><textarea id='coq-ta-22'>
+
+Fixpoint iter {A} (f : A -> A) (n : nat) (a : A) : A :=
+  match n with
+  | O => a
+  | S p => f (iter f p a)
+  end.
+
+Eval compute in iter S 4 3.
+
+Definition iadd n m := iter S n m.
+
+</textarea></div>
+<div><p>
+Incomincia il mal di testa ... </div>
+<div><textarea id='coq-ta-23'>
+Eval compute in iter (iadd 3) 4 0.
+
+Definition imult n m := iter (iadd n) m 0.
+
+Eval compute in iter (imult 2) 5 1.
+
+Definition exp b e := iter (imult b) e 1.
+
+</textarea></div>
+<div><p>
+L'ordine superiore è comodo per definire
+    iteratori su tipi di dato polimorfi 
+<p>
+    fold f (a :: b :: c) x = f c (f b (f a x))
+</div>
+<div><textarea id='coq-ta-24'>
+
+Fixpoint fold {A B} (f : A -> B -> B) (l : list A) (b : B) : B :=
+  match l with
+  | nil => b
+  | x :: xs => fold f xs (f x b)
+  end.
+
+Eval compute in fold addn (1 :: 2 :: 3 :: nil) 0.
+
+</textarea></div>
+<div><p>
+Ora chiediamo a Coq di considerare <tt>addn</tt> come un simbolo
+    privo di corpo </div>
+<div><textarea id='coq-ta-25'>
+
+Eval compute -[addn] in fold addn (1 :: 2 :: 3 :: nil) 0.
+
+</textarea></div>
+<div><p>
+Coq è in grado di calcolare in modo simbolico (<tt>addn</tt> è
+    momentaneament un simbolo). Ciò significa che il
+    comportamento di <tt>fold</tt> non dipende da <tt>f</tt> e che, nella
+    lezione 3, potremo dimostrare proprietà di <tt>fold</tt> valide
+    per ogni <tt>f</tt> <p>
+<p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> ordine superiore
+
+  </li>
+<li> calcolo simbolico 
+
+</li>
+</ul>
+ </div>
+<p>
 </div> <p>
 <hr/>
  <p>
@@ -595,6 +752,9 @@ Eval compute in length (cons 3 (cons 4 nil)).
 <li> argomenti impliciti: <tt>Check pair 2 3</tt>
 
 </li>
+<li> funzioni di ordine superiore e calcolo simbolico
+
+</li>
 </ul>
  </div> <hr/>
  <p>
@@ -604,46 +764,359 @@ Eval compute in length (cons 3 (cons 4 nil)).
 </h2>
 
 <p>
-</div>
-<div><textarea id='coq-ta-17'>
+ 1: Scrivere la funzione anonima 
+       $$ x \mapsto \mathrm{notb}(\mathrm{notb}~x) $$
+       $$ \mathcal{B} \to \mathcal{B} $$
+     e verificarne il tipo. </div>
+<div><textarea id='coq-ta-26'>
 
-Module Exercises.
-
-(* Here you really need induction *)
-
-Lemma odd_exp (m n : nat) : m = n.
-Proof.
-(* fill in *)
-Admitted.
+(* completa... *)
 
 </textarea></div>
 <div><p>
 <p>
 
-<button onclick="hide('sol1')">Solution</button>
+<button onclick="hide('sol1')">Soluzione</button>
 <div id='sol1' class='solution'>
 <pre>
-elim: n => // n IHn.
-rewrite expnS odd_mul IHn orbC.
-move=> {IHn}.
-by case: (odd m).
+Check (fun (b : bool) => notb (notb b)).
 </pre>
 </div>
 
+<hr/>
+  2: Dare il nome <tt>neg2</tt> alla funzione precedente
+       e calcolarla con input <tt>true</tt> e poi
+       con input <tt>false</tt>. </div>
+<div><textarea id='coq-ta-27'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol2')">Soluzione</button>
+<div id='sol2' class='solution'>
+<pre>
+Definition neg2 := (fun (b : bool) => notb (notb b)).
+Eval compute in neg2 true.
+Eval compute in neg2 false.
+</pre>
 </div>
-<div><textarea id='coq-ta-18'>
 
-End Exercises.
+<hr/>
+  3: Definire il tipo di dato <tt>bussola</tt> con
+       costruttori <tt>Nord</tt>, <tt>Sud</tt>, <tt>Est</tt>, <tt>Ovest</tt>. </div>
+<div><textarea id='coq-ta-28'>
 
-</textarea></div>
-<div><p>
-</div> </div>
-<div><textarea id='coq-ta-19'>
-
-(* ------------------------------------------------------ *)
+(* completa... *)
 
 </textarea></div>
 <div><p>
+<p>
+
+<button onclick="hide('sol3')">Soluzione</button>
+<div id='sol3' class='solution'>
+<pre>
+Inductive bussola := Nord | Sud | Est | Ovest.
+</pre>
+</div>
+
+<hr/>
+  4: Definire la funzione <tt>isNord</tt> che data una bussola
+       restituisce il booleano <tt>true</tt> se e solo se
+       la direzione è nord </div>
+<div><textarea id='coq-ta-29'>
+
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol4')">Soluzione</button>
+<div id='sol4' class='solution'>
+<pre>
+Definition isNord b := match b with Nord => true | _ => false end.
+</pre>
+Nota: [_ => ..] significa "in tutti gli altri casi.."
+</div>
+
+<hr/>
+  5: Definire la funzione <tt>xorb</tt> che dati due booleani
+       restituisce <tt>true</tt> se e solo se uno dei due è <tt>true</tt>.
+       Eseguire la funzione con input <tt>true true</tt> e <tt>false true</tt> </div>
+<div><textarea id='coq-ta-30'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol5')">Soluzione</button>
+<div id='sol5' class='solution'>
+<pre>
+Definition xorb b1 b2 :=
+  match b1 with
+  | false => b2
+  | true => notb b2 end.
+Eval compute in xorb true true.
+Eval compute in xorb false true.
+</pre>
+</div>
+
+<p>
+<hr/>
+  6: Scrivere la funzione ricorsiva <tt>eqn</tt> che
+    prende due numeri di tipo <tt>nat</tt> e restituisce <tt>true</tt>
+    se e solo se i due numeri sono uguali. Testare la funzione.
+     </div>
+<div><textarea id='coq-ta-31'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol6')">Soluzione</button>
+<div id='sol6' class='solution'>
+<pre>
+Fixpoint eqn n1 n2 := 
+  match n1 with
+  | O => match n2 with O => true | S _ => false end
+  | S p1 => match n2 with O => false | S p2 => eqn p1 p2 end end.
+Eval compute in eqn 3 4.
+Eval compute in eqn 3 3.
+</pre>
+</div>
+
+<p>
+<hr/>
+  7: Scrivere la funzione ricorsiva <tt>leqn</tt> che
+    prende due numeri di tipo <tt>nat</tt> e restituisce <tt>true</tt>
+    se e solo se il primo numero è minore o uguale al secondo.
+    Testare la funzione.
+     </div>
+<div><textarea id='coq-ta-32'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol7')">Soluzione</button>
+<div id='sol7' class='solution'>
+<pre>
+Fixpoint leqn n1 n2 := 
+  match n1 with
+  | O => true
+  | S p1 => match n2 with O => false | S p2 => leqn p1 p2 end end.
+Eval compute in leqn 3 4.
+Eval compute in leqn 4 3.
+</pre>
+</div>
+
+<p>
+<hr/>
+  8: Definire la funzione <tt>odd</tt> che restituisce <tt>true</tt>
+       se e solo se il numero naturale in input è dispari.
+     </div>
+<div><textarea id='coq-ta-33'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol8')">Soluzione</button>
+<div id='sol8' class='solution'>
+<pre>
+Fixpoint odd n := 
+  match n with
+  | O => false
+  | S O => true
+  | S (S p) => odd p end.
+Eval compute in odd 3.
+Eval compute in odd 4.
+</pre>
+
+Nota: la sintassi concreta di Coq permette di scrivere
+pattern-match profondi.  Non è altro che una notazione.
+Nel caso predente è espansa in
+<pre>
+Fixpoint odd n := 
+  match n with
+  | O => false
+  | S q =>
+    match q with
+    | O => true
+    | S p => odd p end end.
+
+</pre>
+</div>
+
+<p>
+<hr/>
+  8bis: Definire la funzione <tt>swap</tt> che prende
+       una coppia (di tipo <tt>prod A B</tt>) e restituisce
+       la coppia dove gli argomenti sono invertiti (di tipo
+       <tt>prod B A</tt>.
+     </div>
+<div><textarea id='coq-ta-34'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol8x')">Soluzione</button>
+<div id='sol8x' class='solution'>
+<pre>
+Definition swap {A B} (x : prod A B) := 
+   match x with
+   | pair a b => pair b a
+   end.
+</pre>
+</div>
+
+<p>
+<hr/>
+  9: Definire la funzione <tt>filter</tt> che prende
+       una lista (di tipo <tt>A</tt>) una funzione di tipo
+       <tt>(A -> bool)</tt> e restituisce la lista degli elementi
+       sui quali la funzione restituisce <tt>true</tt>.
+       Testare <tt>filter odd (1 :: 2 :: 3 :: nil)</tt>.
+     </div>
+<div><textarea id='coq-ta-35'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol9')">Soluzione</button>
+<div id='sol9' class='solution'>
+<pre>
+Fixpoint filter {A} (f : A -> bool) l := 
+  match l with
+  | nil => nil
+  |  x :: xs =>
+      let ys := filter f xs in
+      match f x with
+      | true =>  x :: ys
+      | false => ys end end.
+Eval compute in filter odd (1 :: 2 :: 3 :: nil).
+</pre>
+
+Nota: la sintassi [let nome := espressione in ..]
+permette di dare un nome a una espression al fine di
+non dovere ripetere l'espressione (potenzialmente 
+grande) in quanto segue.
+
+</div>
+
+<p>
+<hr/>
+  10: Definire la funzione ricorsiva <tt>rev</tt> che prende
+       una lista <tt>l</tt> (di tipo <tt>A</tt>) e restituisce la lista 
+       degli elementi di <tt>l</tt> in ordine inverso.
+       Nota: è possibile definire una funzione ausiliaria.
+       Testare la funzione.
+     </div>
+<div><textarea id='coq-ta-36'>
+
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol10')">Soluzione</button>
+<div id='sol10' class='solution'>
+<pre>
+Fixpoint rev_aux {A} (l : list A) (acc : list A) := 
+  match l with
+   | nil => acc
+   | x :: xs => rev_aux xs (x :: acc) end.
+Definition rev {A} (l : list A) := rev_aux l nil.
+Eval compute in rev (1 :: 2 :: 3 :: nil).
+</pre>
+</div>
+
+<p>
+<hr/>
+  11: Definire la funzione <tt>rev</tt> usando <tt>fold</tt>.
+    (Questa volta chiamiamola <tt>rev2</tt>).
+    Dichiarare che il primo argomento di <tt>rev2</tt> (il tipo <tt>A</tt>)
+    è implicito. Testare la funzione.
+</div>
+<div><textarea id='coq-ta-37'>
+
+(* completa... *)
+(* completa... *)
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol11')">Soluzione</button>
+<div id='sol11' class='solution'>
+<pre>
+Definition rev2 {A} (l : list A) := fold cons l nil.
+Eval compute in rev2 (1 :: 2 :: 3 :: nil).
+</pre>
+</div>
+
+<p>
+ </div> <p>
+<hr/>
+ <p>
+<p>
 
 <script>
 alignWithTop = true;
@@ -738,14 +1211,19 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-20'>
+<div><textarea id='coq-ta-38'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
                   'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
                   'coq-ta-9',  'coq-ta-10',  'coq-ta-11',  'coq-ta-12', 
                   'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16', 
-                  'coq-ta-17',  'coq-ta-18',  'coq-ta-19',  'coq-ta-20'];
+                  'coq-ta-17',  'coq-ta-18',  'coq-ta-19',  'coq-ta-20', 
+                  'coq-ta-21',  'coq-ta-22',  'coq-ta-23',  'coq-ta-24', 
+                  'coq-ta-25',  'coq-ta-26',  'coq-ta-27',  'coq-ta-28', 
+                  'coq-ta-29',  'coq-ta-30',  'coq-ta-31',  'coq-ta-32', 
+                  'coq-ta-33',  'coq-ta-34',  'coq-ta-35',  'coq-ta-36', 
+                  'coq-ta-37',  'coq-ta-38'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->

@@ -54,3 +54,12 @@ p {
 .solution{
   display: none;
 }
+
+.concepts {
+  border-style: solid;
+  border-width: 0 0 0 2px;
+  padding-left: 5px;
+  border-color: blue;
+  font-style: italic;
+  font-size: 14px;
+}

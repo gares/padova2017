@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <link rel="stylesheet" href="jscoq/ui-external/bootstrap.min.css" />
+
+<title>lesson2</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
+<link rel="stylesheet" href="local.css" />
+  </head>
+
+<body>
+  <div id="ide-wrapper" class="toggled">
+  <div id="code-wrapper">
+  <div id="document">
+
+<div><textarea id='coq-ta-1'>
+</textarea></div>
+<div><p>
+<div class='slide vfill'>  
+<h2>
+ Lezione 2
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> Curry Howard: la logica di Coq e le prime dimostrazioni
+<ul class="doclist">
+    <li> Programma : Tipo = Dimostrazione : Enunciato
+
+    </li>
+  <li> connettivi
+
+  </li>
+  <li> vero e falso
+
+  </li>
+  <li> prove di logica proposizionale
+
+  </li>
+  <li> uguaglianza
+
+  </li>
+  <li> prove equazionali
+
+  </li>
+  <li> quantificatori
+
+  </li>
+  <li> prove in logica del primo ordine
+<p>
+  
+  </li>
+  </ul>
+  
+  </li>
+<li> Esercizi
+
+</li>
+</ul>
+<p>
+</div> </div>
+<div><textarea id='coq-ta-2'>
+
+From mathcomp Require Import ssreflect.
+
+</textarea></div>
+<div><p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Fare una dimostrazione è come abitare un tipo
+</h2>
+</div>
+<div><textarea id='coq-ta-3'>
+
+Definition prova1 : nat := O.
+Check prova1.
+
+</textarea></div>
+<div><p>
+Però lo facciamo in modo interattivo, usando
+    dei comandi (tattiche) che costruiscono termini
+    per noi. </div>
+<div><textarea id='coq-ta-4'>
+Lemma prova2 : nat.
+Proof.
+apply: O.
+Qed.
+
+Print prova2.
+
+</textarea></div>
+<div><p>
+I tipi (di dato) che abbiamo visto nella prima
+    lezione non sono adatti a esprimere proprietà
+    o enunciare veri e propri teoremi.
+<p>
+    Ne definiamo quindi altri... 
+<p>
+ <div class="concepts">
+Concetti:
+<p>
+<ul class="doclist">
+  <li> dimostrare = costruire termini passo passo
+
+  </li>
+<li> <tt>Lemma nome : tipo. Proof. ...prova... Qed.</tt>
+
+</li>
+<li> <tt>apply: t</tt> usa <tt>t</tt> per dimostrare il goal corrente, ovvero
+  <tt>t</tt> è un termine che abita il tipo del goal
+ </div>
+
+</li>
+</ul>
+</div>
+<p>
+<p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Connettivi
+</h2>
+<p>
+ $$P \to Q$$ </div>
+<div><textarea id='coq-ta-5'>
+
+Lemma example1 P : P -> P.
+Proof.
+apply: (fun (p : P) => p).
+Qed.
+
+</textarea></div>
+<div><p>
+dimostrare una implicazione (introduzione) </div>
+<div><textarea id='coq-ta-6'>
+Lemma example2 P : P -> P.
+Proof.
+move=> p.
+apply: p.
+Qed.
+
+</textarea></div>
+<div><p>
+Usare una implicazione (MP) </div>
+<div><textarea id='coq-ta-7'>
+Lemma example3 P Q : Q -> (Q -> P) -> P.
+Proof.
+apply: (fun (q : Q) => fun (f : Q -> P) => f q).
+Qed.
+
+Lemma example4 P Q : Q -> (Q -> P) -> P.
+Proof.
+move=> q f.
+apply: (f _).
+apply: q.
+Qed.
+
+</textarea></div>
+<div><p>
+$$P \land Q$$ </div>
+<div><textarea id='coq-ta-8'>
+
+Inductive and P Q := conj (p : P) (q : Q).
+
+Infix "/\" := and : type_scope.
+Arguments conj {P Q} p q.
+
+Lemma andC P Q : P /\ Q -> Q /\ P.
+Proof.
+move=> pq.
+case: pq.
+move=> p q.
+apply: (conj _ _).
+  apply: q.
+apply: p.
+Qed.
+
+</textarea></div>
+<div><p>
+Ricordate l'esercizio 8bis? </div>
+<div><textarea id='coq-ta-9'>
+Lemma andC2 P Q : P /\ Q -> Q /\ P.
+Proof.
+apply: (fun x => match x with conj p q => conj q p end).
+Qed.
+
+</textarea></div>
+<div><p>
+$$P \or Q$$ </div>
+<div><textarea id='coq-ta-10'>
+
+Inductive or P Q :=
+  | left (p : P)
+  | right (q : Q).
+
+Arguments left {P Q} p.
+Arguments right {P Q} q.
+Infix "\/" := or : type_scope.
+
+Lemma orC P Q : P \/ Q -> Q \/ P.
+Proof.
+move=> pq.
+case: pq.
+  move=> p.
+  apply: right.
+  apply: p.
+move=> q.
+apply: left.
+apply: q.
+Qed.
+
+Lemma orC2 P Q : P \/ Q -> Q \/ P.
+Proof.
+apply: (fun pq =>
+          match pq with
+          | left p => right p
+          | right q => left q
+          end).
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> congiunzione <tt>/\</tt>
+
+  </li>
+<li> disgiunzione <tt>\/</tt>
+
+</li>
+<li> <tt>move=> nome</tt>
+
+</li>
+<li> <tt>case: termine</tt>
+
+</li>
+</ul>
+ </div>
+<p>
+ </div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Vero e falso
+</h2>
+<p>
+ $$\top$$ </div>
+<div><textarea id='coq-ta-11'>
+
+Inductive True := I.
+
+Lemma exampleI : True -> True.
+Proof.
+move=> i.
+case: i.
+apply: I.
+Qed.
+
+</textarea></div>
+<div><p>
+$$\bot$$) </div>
+<div><textarea id='coq-ta-12'>
+
+Inductive False := .
+
+Lemma ex_falso P : False -> P.
+Proof.
+move=> abs.
+case: abs.
+Qed.
+
+Lemma ex_falso2 P : False -> P.
+Proof.
+apply: (fun (abs : False) => match abs with end).
+Qed.
+
+</textarea></div>
+<div><p>
+$$\lneg$$ </div>
+<div><textarea id='coq-ta-13'>
+
+Definition not P := P -> False.
+
+Notation "~ p" := (not p) : type_scope.
+
+Lemma contradiction P : P -> not P -> False.
+Proof.
+move=> p np.
+unfold not in np.
+apply: (np _).
+apply: p.
+Qed.
+
+</textarea></div>
+<div><p>
+Note: questo lemma è uguale all'esempio 4 <p>
+<p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> vero e falso: <tt>True</tt>, <tt>False</tt>
+
+  </li>
+<li> negazione: <tt>~</tt>
+
+</li>
+<li> sostituire il nome con il corpo: <tt>unfold name in hyp</tt>
+   (passo non strettamente necessario)
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Uguaglianza
+</h2>
+
+<p>
+  Ora ci siamo stufati della logica proposizionale
+  e passiamo a quella del primo ordine.
+<p>
+  Ci serve un predicato, e partiamo dal più difficle ;-)
+<p>
+</div>
+<div><textarea id='coq-ta-14'>
+
+Universe i. (* hum, perdonate il dettaglio tecnico *)
+
+Inductive Id (A : Type) (a : A) : A -> Type@{i} :=
+  refl : Id A a a.
+
+Check Id.
+Check Id nat 3 4.
+Check Id bool true true.
+</textarea></div>
+<div><p>
+<tt>forall</tt> lega un termine </div>
+<div><textarea id='coq-ta-15'>
+Check refl.
+
+Arguments Id {A} a _.
+Arguments refl {A} a. (* nota: solo 2 argomenti *)
+
+Infix "=" := Id : type_scope.
+
+Check (3 = 4).
+
+(* Usiamo e dimostriamo un'uguaglianza *)
+
+Lemma Id_sym_nat (x y : nat) : x = y -> y = x.
+Proof.
+move=> E.
+rewrite E.
+apply: (refl y).
+Qed.
+
+Lemma Id_sym_nat2 (x y : nat) : x = y -> y = x.
+Proof.
+apply: (fun E : x = y =>
+   match E (*in (_ = a) return a = x*) with
+   | refl => refl x
+   end).
+Qed.
+
+</textarea></div>
+<div><p>
+Id descrive una uguaglianza computazionale </div>
+<div><textarea id='coq-ta-16'>
+
+Lemma test_computation : 3 + 2 = 5.
+Proof.
+apply: refl.
+Qed.
+
+Eval compute in 3 + 2.
+
+</textarea></div>
+<div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> Id <tt>=</tt>
+
+  </li>
+<li> Usare un'uguaglianza: <tt>rewrite</tt>
+
+</li>
+<li> <tt>refl</tt> dimostra <tt>Id</tt> per termini uguali una
+   volta nomalizzati
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Quantificatori
+</h2>
+
+<p>
+   Piccolo ripasso:
+<p>
+   Il <tt>forall</tt> è primitivo, è stato usato
+<p>
+<ul class="doclist">
+  <li> per legare tipi <tt>forall A : Type, list A -> nat</tt>
+
+  </li>
+<li> per legare termini <tt>forall x : A, eq A x x</tt>
+
+</li>
+<li> per legare.. niente <tt>A -> B = forall dummy : A, B</tt>
+
+</li>
+</ul>
+   Il dominio di <tt>forall</tt>
+<p>
+<ul class="doclist">
+  <li> il tipo dei tipi <tt>forall A : Type, ..</tt>
+
+  </li>
+<li> un tipo di dato <tt>forall x : nat, ...</tt>
+
+</li>
+<li> il tipo delle funzioni <tt>forall f : nat -> nat, ...</tt>
+
+</li>
+</ul>
+<p>
+<p>
+    Ora definiamo $$\exists x:A, P x$$
+    che può essere dimostrato fornendo un
+    testimone <tt>t : A</tt> e una prova <tt>p : P t</tt> </div>
+<div><textarea id='coq-ta-17'>
+
+Inductive ex (A : Type) (P : A -> Type) :=
+  exI (a : A) (p : P a).
+
+</textarea></div>
+<div><p>
+Nota: è molto simile alla coppia, ma il tipo
+    della seconda componente dipende val valore della
+    prima </div>
+<div><textarea id='coq-ta-18'>
+
+Check exI.
+</textarea></div>
+<div><p>
+<tt>forall</tt> lega un predicato/funzione </div>
+<div><textarea id='coq-ta-19'>
+Check ex.
+
+Check (fun x : nat => x = 3).
+
+Check ex nat (fun x => x = 3).
+
+Notation "'exists' x : A , p" := (ex A (fun x : A => p)) (at level 200, x ident).
+
+Definition divides d n := exists q : nat, d * q = n.
+
+Lemma div_mul a b : divides a (a * b).
+Proof.
+exists b.
+apply: refl.
+Qed.
+
+Require Import Arith.
+
+Lemma div_trans a b c : divides a b -> divides b c -> divides a c.
+Proof.
+move=> dab dbc.
+case: dab. move=> q Eb.
+case: dbc. move=> p Ec.
+exists (q * p).
+rewrite -Ec -Eb.
+Search (_ * _ * _).
+rewrite Nat.mul_assoc.
+apply: refl.
+Qed.
+
+</textarea></div>
+<div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>exists T P</tt> non è altro che <tt>/\</tt> ovvero la coppia
+   ma dove il tipo della seconda componente dipende dal
+   valore della prima
+
+  </li>
+<li> lo dimostriamo col comando <tt>exists</tt> (senza i <tt>:</tt>)
+
+</li>
+<li> lo usiamo con <tt>case:</tt>
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Dimostrazioni per casi
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-20'>
+
+Lemma andbC a b : andb a b = andb b a.
+Proof.
+case: a.
+  case: b.
+    apply: refl.
+    apply: refl.
+case: b.
+  apply: refl.
+apply: refl.
+(* ripetitiva no? *)
+Qed.
+
+</textarea></div>
+<div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>case:</tt> funziona anche su termini che rappresentano
+   dati, come <tt>bool</tt> e <tt>nat</tt>
+
+  </li>
+<li> <tt>;</tt> per combinare 2 comandi di prova
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Prove all'avanti
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-21'>
+
+Lemma fwd P Q :
+  (P -> Q) -> P -> ~Q -> 0 = 1.
+Proof.
+move=> p2q p nq.
+have q : Q.
+  apply: p2q. apply: p.
+have abs : False.
+  apply: nq. apply q.
+case: abs.
+Qed.
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>have nome : tipo</tt> inizia una sottoprova
+
+  </li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'>
+<h2>
+ Esercizi
+</h2>
+
+<p>
+<p>
+<hr/>
+  Abitare i seguenti tipi (in un colpo solo o con dei
+    comandi di prova) </div>
+<div><textarea id='coq-ta-22'>
+
+Lemma scrambled A B C : (A /\ B) /\ C -> (C /\ A) /\ B.
+Proof.
+apply: (fun x =>
+  match x with
+  | conj (conj a b) c => conj (conj c a) b
+  end).
+Qed.
+
+Lemma eggs P Q R : (P \/ Q -> R) -> Q -> R.
+Proof.
+apply: (fun f q => f (right q)).
+Qed.
+
+Lemma DM P Q : (~ P /\ ~ Q) -> ~ (P \/ Q).
+Proof.
+move=> npnq. case: npnq => np nq.
+move=> poq. case: poq. apply: np. apply: nq.
+Qed.
+
+(* link to wikipedia *)
+
+Lemma Peirce :
+  (forall Q P, (((P -> Q) -> P) -> P)) ->
+  (forall P, P \/ ~ P).
+Proof.
+move=> cc P.
+apply: (cc False).
+move=> truth.
+apply: right.
+move=> p.
+apply: truth.
+apply: left.
+apply: p.
+Qed.
+
+</textarea></div>
+<div><p>
+<hr/>
+  Dimostrare che <tt>orb</tt> è commutativo </div>
+<div><textarea id='coq-ta-23'>
+
+Definition orb b1 b2 :=
+  match b1 with
+  | true => true
+  | false => b2
+  end.
+
+Lemma orbC b1 b2 : orb b1 b2 = orb b2 b1.
+Proof.
+case: b1; case: b2; apply: refl.
+Qed.
+
+</textarea></div>
+<div><p>
+<hr/>
+  Dimostrare che <tt>orb</tt> è associativo </div>
+<div><textarea id='coq-ta-24'>
+
+Lemma orbA b1 b2 b3 : orb b1 (orb b2 b3) = orb (orb b1 b2) b3.
+Proof.
+case: b1; case: b2; case: b3; apply: refl.
+Qed.
+
+</textarea></div>
+<div><p>
+<hr/>
+  Dimostrare il seguente lemma </div>
+<div><textarea id='coq-ta-25'>
+
+Lemma EMb b : orb b (negb b) = true.
+Proof.
+case: b; apply: refl.
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol1')">Solution</button>
+<div id='sol1' class='solution'>
+<pre>
+...
+</pre>
+</div>
+
+<p>
+ </div> <p>
+<hr/>
+ <p>
+<p>
+
+<script>
+alignWithTop = true;
+current = 0;
+slides = [];
+function select_current() {
+  for (var i = 0; i < slides.length; i++) {
+    var s = document.getElementById('slideno' + i);
+    if (i == current) {
+      s.setAttribute('class','slideno selected');
+    } else {
+      s.setAttribute('class','slideno');
+    }
+  }	
+}
+function init_slides() {
+  var toolbar = document.getElementById('panel-wrapper');
+  if (toolbar) {
+  var tools = document.createElement("div");
+  var tprev = document.createElement("div");
+  var tnext = document.createElement("div");
+  tools.setAttribute('id','tools');
+  tprev.setAttribute('id','prev');
+  tprev.setAttribute('onclick','prev_slide();');
+  tnext.setAttribute('id','next');
+  tnext.setAttribute('onclick','next_slide();');
+  toolbar.appendChild(tools);
+  tools.appendChild(tprev);
+  tools.appendChild(tnext);
+  
+  slides = document.getElementsByClassName('slide');
+  for (var i = 0; i < slides.length; i++) {
+    var s = document.createElement("div");
+    s.setAttribute('id','slideno' + i);
+    s.setAttribute('class','slideno');
+    s.setAttribute('onclick','goto_slide('+ i +');');
+    s.innerHTML = i;
+    tools.appendChild(s);
+  }
+  select_current();
+  } else {
+  //retry later
+  setTimeout(init_slides,100);	  
+  }
+}
+function on_screen(rect) {
+  return (
+    rect.top >= 0 &&
+    rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+function update_scrolled(){
+  for (var i = slides.length-1; i >= 0; i--) {
+    var rect = slides[i].getBoundingClientRect();
+      if (on_screen(rect)) {
+        current = i;
+        select_current();	
+    }
+  }
+}
+function goto_slide(n) {
+  current = n;
+  var element = slides[current];
+  console.log(element);
+  element.scrollIntoView(alignWithTop);
+  select_current();
+}
+function next_slide() {
+  current++;
+  if (current >= slides.length) { current = slides.length - 1; }
+  var element = slides[current];
+  console.log(element);
+  element.scrollIntoView(alignWithTop);
+  select_current();
+}
+function prev_slide() {
+  current--;
+  if (current < 0) { current = 0; }
+  var element = slides[current];
+  element.scrollIntoView(alignWithTop);
+  select_current();
+}
+function hide (element_id) {
+  element = document.getElementById(element_id);
+    if (element.style.display != 'block') {
+      element.style.display = 'block';
+    } else {
+      element.style.display = 'none';
+    }
+}
+window.onload = init_slides;
+window.onscroll = update_scrolled;
+</script>
+ </div>
+<div><textarea id='coq-ta-26'>
+</textarea></div>
+<script type="text/javascript">
+ var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
+                  'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
+                  'coq-ta-9',  'coq-ta-10',  'coq-ta-11',  'coq-ta-12', 
+                  'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16', 
+                  'coq-ta-17',  'coq-ta-18',  'coq-ta-19',  'coq-ta-20', 
+                  'coq-ta-21',  'coq-ta-22',  'coq-ta-23',  'coq-ta-24', 
+                  'coq-ta-25',  'coq-ta-26'];
+</script>
+  </div> <!-- /#document     -->
+  </div> <!-- /#code-wrapper -->
+  </div> <!-- /#ide-wrapper  -->
+
+  <script src="./jscoq/ui-js/jscoq-loader.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var coq;
+
+    loadJsCoq('./jscoq/')
+              .then(loadJs("./jscoq/ui-external/CodeMirror/addon/runmode/runmode"))
+              .then(loadJs("./jscoq/ui-external/CodeMirror/addon/runmode/colorize"))
+              .then( function () {
+                  var coqInline = document.getElementsByClassName("inline-coq");
+                  CodeMirror.colorize(coqInline); })
+              .then( function () {
+                  coq = new CoqManager (coqdoc_ids,
+                                       { base_path: './jscoq/', init_pkgs: ['init'] }
+                  );
+              });
+  </script>
+</body>
+</html>
+
