@@ -46,7 +46,8 @@ Definition g (x : nat) (y : nat) : nat :=
 
  Nota: anche se [nat], [+], [*] e [1] sono concetti definibili
   in Coq, l'ambiente iniziale non è vuoto ma contiene
-  alcuni declarazioni utili a fare esempi
+  alcuni declarazioni utili a fare esempi come i numeri
+  naturali e le operazioni di addizione e moltiplicazione
 
  #<div class="concepts">#
  Concetti:
@@ -128,15 +129,15 @@ Check (S O).
     la dichiarazione di tipi di dato.
 
   Quella che abbiamo utilizzato è la più simile a quella
-  usata nelle note del corso e anche nei linguaggi di
-  programmazione.  Se chiediamo a Coq di stampare una
+  usata nelle note del corso (e anche nei linguaggi di
+  programmazione).  Se chiediamo a Coq di stampare una
   dichiarazione di tipo con:
 
 *)
 
 Print nat.
 
-(** Ottenia la stampa in una sintassi alternativa *)
+(** otteniamo la stampa in una sintassi alternativa. *)
 
 End ProvaBoolNat.
 
@@ -172,7 +173,10 @@ Check (S O).
    del corso) è fornito in _kit_:
    - il costrutto [match] fornisce l'analisi per casi
    - il costrutto [Fixpoint] (in seguito) fornisce
-     ``l'ipotesi induttiva''
+     "l'ipotesi induttiva"
+ - Inoltre le regole computazionali dell'eliminatore
+   sono date dalla combinazione
+     di [match] e [Fixpoint]
 
 *)
 
@@ -230,9 +234,9 @@ Eval compute in pred O.
 *)
 
 
-(** Il termine a cui il [math] è applicato vienre
+(** Il termine a cui il [match] è applicato viene
     messo in forma canonica. In altre parole i casi del
-    [match] parlano della forma canonica *)
+    [match] parlano della forma canonica. *)
 Eval compute in
   match 2 + 1 with
   | O => O
@@ -278,7 +282,7 @@ Eval compute in addn 2 4.
   6
 >>
 
-Non tutti i programmi sono accettati! *)
+Non tutti i programmi ricorsivi sono accettati! *)
 
 Fail
   Fixpoint loop (n : nat) : bool := loop n.
@@ -299,7 +303,9 @@ Concetti:
 ** Tipi di dato polimorfi
 
  I tipi di dato polimorfi sono, in genere, dei contenitori
- per aggregare vari termini e che vogliamo riutilizzare.
+ per aggregare vari termini. Inoltre vogliamo spesso
+ riutilizzare tali contenitori per aggregare termini
+ di tipo di volta in volta diverso.
 
  Esempi classici:
  - La coppia XXX(a,b)XXX dove XXXa : AXXX e XXXb : BXXX
@@ -445,7 +451,7 @@ Concetti:
 (** #<div class='slide'># 
 ** Ordine superiore e calcolo simbolico
 
-  Le funzione possono essere passate ad altre funzioni
+  Le funzioni possono essere passate ad altre funzioni
   come argumenti
 
   iter f 3 x = f (f (f x))

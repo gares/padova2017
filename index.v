@@ -73,7 +73,7 @@ Qed.
  - #<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson1.html">lezione 1</a>#: Coq: un linguaggio di programmazione funzionale
  - #<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson2.html">lezione 2</a>#: Curry Howard: la logica di Coq e le prime dimostrazioni
  - #<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson3.html">lezione 3</a>#: Induzione: proprietà di programmi ricorsivi
- - #<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson4.html">lezione 4</a>#: Riflessione computazionale: l'esecusione di un programma è una prova
+ - #<a href="http://www-sop.inria.fr/members/Enrico.Tassi/padova2017/lesson4.html">lezione 4</a>#: Riflessione computazionale: l'esecuzione di un programma è una prova
 
 #</div>#
 -------------------------------------------- *)

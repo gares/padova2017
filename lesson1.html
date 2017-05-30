@@ -96,7 +96,8 @@ Definition g (x : nat) (y : nat) : nat :=
 <p>
  Nota: anche se <tt>nat</tt>, <tt>+</tt>, <tt>*</tt> e <tt>1</tt> sono concetti definibili
   in Coq, l'ambiente iniziale non è vuoto ma contiene
-  alcuni declarazioni utili a fare esempi
+  alcuni declarazioni utili a fare esempi come i numeri
+  naturali e le operazioni di addizione e moltiplicazione
 <p>
  <div class="concepts">
  Concetti:
@@ -214,8 +215,8 @@ Nota: esistono varie sintassi alternative per
     la dichiarazione di tipi di dato.
 <p>
   Quella che abbiamo utilizzato è la più simile a quella
-  usata nelle note del corso e anche nei linguaggi di
-  programmazione.  Se chiediamo a Coq di stampare una
+  usata nelle note del corso (e anche nei linguaggi di
+  programmazione).  Se chiediamo a Coq di stampare una
   dichiarazione di tipo con:
 <p>
 </div>
@@ -225,7 +226,7 @@ Print nat.
 
 </textarea></div>
 <div><p>
-Ottenia la stampa in una sintassi alternativa </div>
+otteniamo la stampa in una sintassi alternativa. </div>
 <div><textarea id='coq-ta-10'>
 
 End ProvaBoolNat.
@@ -281,12 +282,17 @@ Check (S O).
 
     </li>
   <li> il costrutto <tt>Fixpoint</tt> (in seguito) fornisce
-     ``l'ipotesi induttiva''
+     <quote>l'ipotesi induttiva</quote>
 
   </li>
   </ul>
   
   </li>
+<li> Inoltre le regole computazionali dell'eliminatore
+   sono date dalla combinazione
+     di <tt>match</tt> e <tt>Fixpoint</tt>
+
+</li>
 </ul>
 <p>
 </div>
@@ -357,9 +363,9 @@ Eval compute in pred O.
    S p  ==?== S (S O)  sì, p lega (S O)
 </pre>
 <p>
- Il termine a cui il <tt>math</tt> è applicato vienre
+ Il termine a cui il <tt>match</tt> è applicato viene
     messo in forma canonica. In altre parole i casi del
-    <tt>match</tt> parlano della forma canonica </div>
+    <tt>match</tt> parlano della forma canonica. </div>
 <div><textarea id='coq-ta-14'>
 Eval compute in
   match 2 + 1 with
@@ -421,7 +427,7 @@ Esempio di esecuzione:
   6
 </pre>
 <p>
-Non tutti i programmi sono accettati! </div>
+Non tutti i programmi ricorsivi sono accettati! </div>
 <div><textarea id='coq-ta-16'>
 
 Fail
@@ -453,7 +459,9 @@ Concetti:
 
 <p>
  I tipi di dato polimorfi sono, in genere, dei contenitori
- per aggregare vari termini e che vogliamo riutilizzare.
+ per aggregare vari termini. Inoltre vogliamo spesso
+ riutilizzare tali contenitori per aggregare termini
+ di tipo di volta in volta diverso.
 <p>
  Esempi classici:
 <p>
@@ -648,7 +656,7 @@ Concetti:
 </h2>
 
 <p>
-  Le funzione possono essere passate ad altre funzioni
+  Le funzioni possono essere passate ad altre funzioni
   come argumenti
 <p>
   iter f 3 x = f (f (f x))
