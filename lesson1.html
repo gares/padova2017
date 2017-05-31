@@ -328,6 +328,22 @@ Definition pred (n : nat) : nat :=
   end.
 
 Eval compute in pred 3.
+
+</textarea></div>
+<div><p>
+  Esempio di esecuzione:
+<pre>
+   match S (S O) with
+   | O => O
+   | S p => p
+   end
+
+   O    ==?== S (S O)  no, proviamo la prossima clausola
+   S p  ==?== S (S O)  sì, p lega (S O)
+</pre>
+</div>
+<div><textarea id='coq-ta-14'>
+
 Eval compute in pred O.
 
 </textarea></div>
@@ -350,23 +366,10 @@ Eval compute in pred O.
     e può essere utilizzata nel corpo della clausola
 
 </li>
-</ul>
-<p>
-  Esempio di esecuzione:
-<pre>
-   match S (S O) with
-   | O => O
-   | S p => p
-   end
-
-   O    ==?== S (S O)  no, proviamo la prossima clausola
-   S p  ==?== S (S O)  sì, p lega (S O)
-</pre>
-<p>
- Il termine a cui il <tt>match</tt> è applicato viene
+<li> il termine a cui il <tt>match</tt> è applicato viene
     messo in forma canonica. In altre parole i casi del
     <tt>match</tt> parlano della forma canonica. </div>
-<div><textarea id='coq-ta-14'>
+<div><textarea id='coq-ta-15'>
 Eval compute in
   match 2 + 1 with
   | O => O
@@ -380,10 +383,11 @@ Eval compute in
  <div class="concepts">
  Concetti:
 <p>
-<ul class="doclist">
-  <li> pattern matching <tt>match .. with .. end</tt>
 
-  </li>
+</li>
+<li> pattern matching <tt>match .. with .. end</tt>
+
+</li>
 <li> forma delle clausole <tt>K x => v</tt> dove <tt>K</tt> è un costruttore
 
 </li>
@@ -404,13 +408,20 @@ Eval compute in
 <p>
 Definiamo l'addizione sui numeri naturali.
 <p>
+$$
+ 0 + m = m
+$$
+$$
+S~p + m = S (p + m)
+$$
+<p>
 </div>
-<div><textarea id='coq-ta-15'>
+<div><textarea id='coq-ta-16'>
 
 Fixpoint addn (n : nat) (m : nat) : nat :=
   match n with
-  | O => m  (* 0 + m = m *)
-  | S p => S (addn p m)   (* S p + m = S (p + m) *)
+  | O => m
+  | S p => S (addn p m)
   end.
 
 Eval compute in addn 2 4.
@@ -428,7 +439,7 @@ Esempio di esecuzione:
 </pre>
 <p>
 Non tutti i programmi ricorsivi sono accettati! </div>
-<div><textarea id='coq-ta-16'>
+<div><textarea id='coq-ta-17'>
 
 Fail
   Fixpoint loop (n : nat) : bool := loop n.
@@ -469,13 +480,13 @@ Concetti:
   <li> La coppia XXX(a,b)XXX dove XXXa : AXXX e XXXb : BXXX
 
   </li>
-<li> La lista XXXx_1 :: .. :: x_nXXX dove XXXx_i : AXXX
+<li> La lista XXXx_1 :: \ldots :: x_nXXX dove XXXx_i : AXXX
 
 </li>
 </ul>
 <p>
 </div>
-<div><textarea id='coq-ta-17'>
+<div><textarea id='coq-ta-18'>
 
 Inductive prod (A : Type) (B : Type) :=
   | pair (a : A) (b : B).
@@ -489,7 +500,7 @@ Check pair.
 <tt>forall A B : Type</tt>, ci indica che <tt>pair</tt> è polimorfo,
     ovvero A e B possono essere rimpiazzati per tipi di dato
     a piacere </div>
-<div><textarea id='coq-ta-18'>
+<div><textarea id='coq-ta-19'>
 
 Check pair nat bool.
 Check pair nat bool 3 false.
@@ -503,9 +514,11 @@ Come assegnare il tipo a una applicazione
       addn 3 : nat -> nat
       addn 3 4 : nat
 </pre>
+<p>
     Se il tipo è quantificato, allora il valore
     dell'argomento sostituisce la variabile in ciò
     che rimane
+<p>
 <pre>
       pair : forall A, forall B, A -> B -> prod A B
       pair nat : forall B, nat -> B -> prod nat B
@@ -514,7 +527,7 @@ Come assegnare il tipo a una applicazione
       pair nat bool 3 false : prod nat bool
 </pre>
 </div>
-<div><textarea id='coq-ta-19'>
+<div><textarea id='coq-ta-20'>
 
 Definition fst (A : Type) (B : Type) (x : prod A B) : A :=
   match x with
@@ -556,7 +569,7 @@ Concetti:
   sono molto verbosi e contengono informazione ridondante.
 <p>
 </div>
-<div><textarea id='coq-ta-20'>
+<div><textarea id='coq-ta-21'>
 
 Check pair _ _ 3 false.
 Eval compute in fst _ _ (pair _ _ 3 false).
@@ -594,7 +607,7 @@ Concetti:
 
 <p>
 </div>
-<div><textarea id='coq-ta-21'>
+<div><textarea id='coq-ta-22'>
 
 Inductive list (A : Type) :=
   nil | cons (a : A) (tl : list A).
@@ -662,7 +675,7 @@ Concetti:
   iter f 3 x = f (f (f x))
 <p>
 </div>
-<div><textarea id='coq-ta-22'>
+<div><textarea id='coq-ta-23'>
 
 Fixpoint iter {A} (f : A -> A) (n : nat) (a : A) : A :=
   match n with
@@ -677,7 +690,7 @@ Definition iadd n m := iter S n m.
 </textarea></div>
 <div><p>
 Incomincia il mal di testa ... </div>
-<div><textarea id='coq-ta-23'>
+<div><textarea id='coq-ta-24'>
 Eval compute in iter (iadd 3) 4 0.
 
 Definition imult n m := iter (iadd n) m 0.
@@ -693,7 +706,7 @@ L'ordine superiore è comodo per definire
 <p>
     fold f (a :: b :: c) x = f c (f b (f a x))
 </div>
-<div><textarea id='coq-ta-24'>
+<div><textarea id='coq-ta-25'>
 
 Fixpoint fold {A B} (f : A -> B -> B) (l : list A) (b : B) : B :=
   match l with
@@ -707,7 +720,7 @@ Eval compute in fold addn (1 :: 2 :: 3 :: nil) 0.
 <div><p>
 Ora chiediamo a Coq di considerare <tt>addn</tt> come un simbolo
     privo di corpo </div>
-<div><textarea id='coq-ta-25'>
+<div><textarea id='coq-ta-26'>
 
 Eval compute -[addn] in fold addn (1 :: 2 :: 3 :: nil) 0.
 
@@ -776,7 +789,7 @@ Concetti:
        $$ x \mapsto \mathrm{notb}(\mathrm{notb}~x) $$
        $$ \mathcal{B} \to \mathcal{B} $$
      e verificarne il tipo. </div>
-<div><textarea id='coq-ta-26'>
+<div><textarea id='coq-ta-27'>
 
 (* completa... *)
 
@@ -795,7 +808,7 @@ Check (fun (b : bool) => notb (notb b)).
   2: Dare il nome <tt>neg2</tt> alla funzione precedente
        e calcolarla con input <tt>true</tt> e poi
        con input <tt>false</tt>. </div>
-<div><textarea id='coq-ta-27'>
+<div><textarea id='coq-ta-28'>
 
 (* completa... *)
 (* completa... *)
@@ -817,7 +830,7 @@ Eval compute in neg2 false.
 <hr/>
   3: Definire il tipo di dato <tt>bussola</tt> con
        costruttori <tt>Nord</tt>, <tt>Sud</tt>, <tt>Est</tt>, <tt>Ovest</tt>. </div>
-<div><textarea id='coq-ta-28'>
+<div><textarea id='coq-ta-29'>
 
 (* completa... *)
 
@@ -836,7 +849,7 @@ Inductive bussola := Nord | Sud | Est | Ovest.
   4: Definire la funzione <tt>isNord</tt> che data una bussola
        restituisce il booleano <tt>true</tt> se e solo se
        la direzione è nord </div>
-<div><textarea id='coq-ta-29'>
+<div><textarea id='coq-ta-30'>
 
 (* completa... *)
 
@@ -856,7 +869,7 @@ Nota: [_ => ..] significa "in tutti gli altri casi.."
   5: Definire la funzione <tt>xorb</tt> che dati due booleani
        restituisce <tt>true</tt> se e solo se uno dei due è <tt>true</tt>.
        Eseguire la funzione con input <tt>true true</tt> e <tt>false true</tt> </div>
-<div><textarea id='coq-ta-30'>
+<div><textarea id='coq-ta-31'>
 
 (* completa... *)
 (* completa... *)
@@ -887,7 +900,7 @@ Eval compute in xorb false true.
     prende due numeri di tipo <tt>nat</tt> e restituisce <tt>true</tt>
     se e solo se i due numeri sono uguali. Testare la funzione.
      </div>
-<div><textarea id='coq-ta-31'>
+<div><textarea id='coq-ta-32'>
 
 (* completa... *)
 (* completa... *)
@@ -919,7 +932,7 @@ Eval compute in eqn 3 3.
     se e solo se il primo numero è minore o uguale al secondo.
     Testare la funzione.
      </div>
-<div><textarea id='coq-ta-32'>
+<div><textarea id='coq-ta-33'>
 
 (* completa... *)
 (* completa... *)
@@ -949,7 +962,7 @@ Eval compute in leqn 4 3.
   8: Definire la funzione <tt>odd</tt> che restituisce <tt>true</tt>
        se e solo se il numero naturale in input è dispari.
      </div>
-<div><textarea id='coq-ta-33'>
+<div><textarea id='coq-ta-34'>
 
 (* completa... *)
 (* completa... *)
@@ -997,7 +1010,7 @@ Fixpoint odd n :=
        la coppia dove gli argomenti sono invertiti (di tipo
        <tt>prod B A</tt>.
      </div>
-<div><textarea id='coq-ta-34'>
+<div><textarea id='coq-ta-35'>
 
 (* completa... *)
 (* completa... *)
@@ -1026,7 +1039,7 @@ Definition swap {A B} (x : prod A B) :=
        sui quali la funzione restituisce <tt>true</tt>.
        Testare <tt>filter odd (1 :: 2 :: 3 :: nil)</tt>.
      </div>
-<div><textarea id='coq-ta-35'>
+<div><textarea id='coq-ta-36'>
 
 (* completa... *)
 (* completa... *)
@@ -1071,7 +1084,7 @@ grande) in quanto segue.
        Nota: è possibile definire una funzione ausiliaria.
        Testare la funzione.
      </div>
-<div><textarea id='coq-ta-36'>
+<div><textarea id='coq-ta-37'>
 
 (* completa... *)
 (* completa... *)
@@ -1103,7 +1116,7 @@ Eval compute in rev (1 :: 2 :: 3 :: nil).
     Dichiarare che il primo argomento di <tt>rev2</tt> (il tipo <tt>A</tt>)
     è implicito. Testare la funzione.
 </div>
-<div><textarea id='coq-ta-37'>
+<div><textarea id='coq-ta-38'>
 
 (* completa... *)
 (* completa... *)
@@ -1219,7 +1232,7 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-38'>
+<div><textarea id='coq-ta-39'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
@@ -1231,7 +1244,7 @@ window.onscroll = update_scrolled;
                   'coq-ta-25',  'coq-ta-26',  'coq-ta-27',  'coq-ta-28', 
                   'coq-ta-29',  'coq-ta-30',  'coq-ta-31',  'coq-ta-32', 
                   'coq-ta-33',  'coq-ta-34',  'coq-ta-35',  'coq-ta-36', 
-                  'coq-ta-37',  'coq-ta-38'];
+                  'coq-ta-37',  'coq-ta-38',  'coq-ta-39'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->

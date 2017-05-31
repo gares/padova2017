@@ -207,19 +207,8 @@ Definition pred (n : nat) : nat :=
   end.
 
 Eval compute in pred 3.
-Eval compute in pred O.
 
-(** 
-  Note:
-  - Ogni clausola del pattern matching è della forma
-    [| pattern => corpo]
-    dove pattern è un costruttore applicato a un numero
-    di variabili appropriato
-  - Tutti i costruttori del tipo di dato devono essere
-    trattati da un pattern (eg anche il caso [O] per [pred])
-  - _p_ è una variabile legata dal pattern matching
-    e può essere utilizzata nel corpo della clausola
-*)
+
 (**
   Esempio di esecuzione:
 <<
@@ -233,8 +222,19 @@ Eval compute in pred O.
 >>
 *)
 
+Eval compute in pred O.
 
-(** Il termine a cui il [match] è applicato viene
+(** 
+  Note:
+  - Ogni clausola del pattern matching è della forma
+    [| pattern => corpo]
+    dove pattern è un costruttore applicato a un numero
+    di variabili appropriato
+  - Tutti i costruttori del tipo di dato devono essere
+    trattati da un pattern (eg anche il caso [O] per [pred])
+  - _p_ è una variabile legata dal pattern matching
+    e può essere utilizzata nel corpo della clausola
+  - il termine a cui il [match] è applicato viene
     messo in forma canonica. In altre parole i casi del
     [match] parlano della forma canonica. *)
 Eval compute in
@@ -262,12 +262,19 @@ Eval compute in
 
 Definiamo l'addizione sui numeri naturali.
 
+$$$$
+ 0 + m = m
+$$$$
+$$$$
+S~p + m = S (p + m)
+$$$$
+
 *)
 
 Fixpoint addn (n : nat) (m : nat) : nat :=
   match n with
-  | O => m  (* 0 + m = m *)
-  | S p => S (addn p m)   (* S p + m = S (p + m) *)
+  | O => m
+  | S p => S (addn p m)
   end.
 
 Eval compute in addn 2 4.
@@ -309,7 +316,7 @@ Concetti:
 
  Esempi classici:
  - La coppia XXX(a,b)XXX dove XXXa : AXXX e XXXb : BXXX
- - La lista XXXx_1 :: .. :: x_nXXX dove XXXx_i : AXXX
+ - La lista XXXx_1 :: \ldots :: x_nXXX dove XXXx_i : AXXX
 
 *)
 
@@ -335,9 +342,11 @@ Check pair nat nat 4 5.
       addn 3 : nat -> nat
       addn 3 4 : nat
 >>
+
     Se il tipo è quantificato, allora il valore
     dell'argomento sostituisce la variabile in ciò
     che rimane
+
 <<
       pair : forall A, forall B, A -> B -> prod A B
       pair nat : forall B, nat -> B -> prod nat B
