@@ -1,3 +1,76 @@
+(** Note sulla lezione 1
+
+- [match .. with .. end] è un termine e può
+  essere usato dovunque, non solo alla radice
+*)
+
+Fixpoint odd  n :=
+  match n with
+  | O => false
+  | S p =>
+     match p with
+     | O => true
+     | S q => odd q
+     end
+  end.
+
+Definition notb b := match b with true => false | false => true end.
+
+Fixpoint odd2  n :=
+  match n with
+  | O => false
+  | S p => notb (odd2 p)
+  end.
+(**
+
+  E le chiamae ricorsive sono accettate anche su
+  sotto-sotto-termini
+
+- I tipi induttivi ammetteno un principio di induzione/
+  ricorsione standard
+*)
+
+Check nat_rect.
+Check (nat_rect (fun x => bool)).
+
+Definition odd3 :=
+  nat_rect (fun x => bool)
+    false
+    (fun p b => notb b).
+Eval compute in odd3 4.
+Eval compute -[notb] in odd3.
+
+(** Tipi di dato indiciati e i
+    casi impossibili *)
+Module Vector.
+
+  Inductive vect (A : Type) : nat -> Type :=
+  | vnil : vect A 0
+  | vcons : forall n, A -> vect A n -> vect A (1+n).
+
+  Arguments vnil {_}.
+  Arguments vcons {_ _} _ _.
+
+  Definition hd {A n} (v : vect A (S n)) : A :=
+  match v in vect _ l return
+    match l with
+    | S _ => A
+    | O => bool
+    end
+  with
+  | vcons x xs => x
+  | vnil => true
+  end.
+
+  Fail Check hd (vnil nat).
+  Eval compute in
+    hd (vcons 3 (vcons 2 vnil)).
+  Check  (vcons 3 (vcons 2 vnil)).
+
+End Vector.
+
+(** ----------------------------- *)
+
 (** #<div class='slide vfill'>#  
 ** Lezione 2
 
@@ -16,6 +89,7 @@
 #</div># *)
 
 From mathcomp Require Import ssreflect.
+
 
 (** -------------------------------------------- *)
 
@@ -90,7 +164,7 @@ Qed.
 
 Inductive and P Q := conj (p : P) (q : Q).
 
-Infix "/\" := and : type_scope.
+Infix "/\ " := and : type_scope.
 Arguments conj {P Q} p q.
 
 Lemma andC P Q : P /\ Q -> Q /\ P.
@@ -109,7 +183,7 @@ Proof.
 apply: (fun x => match x with conj p q => conj q p end).
 Qed.
 
-(** $$$$P \or Q$$$$ *)
+(** $$$$P \lor Q$$$$ *)
 
 Inductive or P Q :=
   | left (p : P)
@@ -117,7 +191,7 @@ Inductive or P Q :=
 
 Arguments left {P Q} p.
 Arguments right {P Q} q.
-Infix "\/" := or : type_scope.
+Infix "\/" := or  : type_scope.
 
 Lemma orC P Q : P \/ Q -> Q \/ P.
 Proof.
@@ -168,7 +242,7 @@ case: i.
 apply: I.
 Qed.
 
-(** $$$$\bot$$$$) *)
+(** $$$$\bot$$$$ *)
 
 Inductive False := .
 
@@ -183,7 +257,7 @@ Proof.
 apply: (fun (abs : False) => match abs with end).
 Qed.
 
-(** $$$$\lneg$$$$ *)
+(** $$$$\neg$$$$ *)
 
 Definition not P := P -> False.
 
@@ -220,48 +294,48 @@ Qed.
 
   Ci serve un predicato, e partiamo dal più difficle ;-)
 
+  Il tipo [Id] (che in Coq si chiama [eq])
+
 *)
 
-Universe i. (* hum, perdonate il dettaglio tecnico *)
+Inductive eq (A : Type) (a : A) : A -> Type :=
+  erefl : eq A a a.
 
-Inductive Id (A : Type) (a : A) : A -> Type@{i} :=
-  refl : Id A a a.
-
-Check Id.
-Check Id nat 3 4.
-Check Id bool true true.
+Check eq.
+Check eq nat 3 4.
+Check eq bool true true.
 (** [forall] lega un termine *)
-Check refl.
+Check erefl.
 
-Arguments Id {A} a _.
-Arguments refl {A} a. (* nota: solo 2 argomenti *)
+Arguments eq {A} a _.
+Arguments erefl {A} a. (* nota: solo 2 argomenti *)
 
-Infix "=" := Id : type_scope.
+Infix "=" := eq : type_scope.
 
 Check (3 = 4).
 
 (* Usiamo e dimostriamo un'uguaglianza *)
 
-Lemma Id_sym_nat (x y : nat) : x = y -> y = x.
+Lemma eq_sym_nat (x y : nat) : x = y -> y = x.
 Proof.
 move=> E.
 rewrite E.
-apply: (refl y).
+apply: (erefl y).
 Qed.
 
-Lemma Id_sym_nat2 (x y : nat) : x = y -> y = x.
+Lemma eq_sym_nat2 (x y : nat) : x = y -> y = x.
 Proof.
 apply: (fun E : x = y =>
    match E (*in (_ = a) return a = x*) with
-   | refl => refl x
+   | erefl => erefl x
    end).
 Qed.
 
-(** Id descrive una uguaglianza computazionale *)
+(** eq (Id) descrive una uguaglianza computazionale *)
 
 Lemma test_computation : 3 + 2 = 5.
 Proof.
-apply: refl.
+apply: erefl.
 Qed.
 
 Eval compute in 3 + 2.
@@ -269,10 +343,12 @@ Eval compute in 3 + 2.
 (**
  #<div class="concepts">#
  Concetti:
- - Id [=]
+ - uguaglianza [=] (Id nelle note del corso)
  - Usare un'uguaglianza: [rewrite]
- - [refl] dimostra [Id] per termini uguali una
+ - [erefl] dimostra [eq] per termini uguali una
    volta nomalizzati
+ - tipare un [match] (la clausola [return] e
+   il tipo "da fuori" e "da dentro"
  #</div>#
 
 #</div># *)
@@ -293,38 +369,70 @@ Eval compute in 3 + 2.
    - un tipo di dato [forall x : nat, ...]
    - il tipo delle funzioni [forall f : nat -> nat, ...]
 *)
+(**
+    Ora usiamo $$$$\forall x:A, P x$$$$
+    che può essere dimostrato fornendo un
+    funzione che data una prova di [A] (chiamata [x])
+    produce una prova di [P x] *)
+
+Lemma test_forall : forall x : nat, x = x.
+Proof.
+apply: (fun x : nat => erefl x).
+Qed.
+
+Lemma test_forall2 : forall x : nat, x = x.
+Proof.
+move=> x.
+apply: erefl x.
+Qed.
+
+(** Nota: del tutto simile alla prova di [P -> P] fatta
+nella slide 2 *)
+
+Lemma test_uso_forall :
+	 (forall x : nat, x * 0 = 0) -> 3 * 0 = 0.
+Proof.
+move=> mulx0.
+Check (mulx0 3).
+apply: (mulx0 3).
+Qed.
+
+(** Nota: anche in questo caso il comportamento di XXX\forallXXX
+è molto simile a quello di XXX\toXXX *)
 
 (**
     Ora definiamo $$$$\exists x:A, P x$$$$
     che può essere dimostrato fornendo un
     testimone [t : A] e una prova [p : P t] *) 
 
-Inductive ex (A : Type) (P : A -> Type) :=
-  exI (a : A) (p : P a).
+Inductive sig (A : Type) (P : A -> Type) :=
+  sigI (a : A) (p : P a).
 
 (** Nota: è molto simile alla coppia, ma il tipo
     della seconda componente dipende val valore della
     prima *)
 
-Check exI.
+Check sigI.
 (** [forall] lega un predicato/funzione *)
-Check ex.
+Check sig.
 
 Check (fun x : nat => x = 3).
 
-Check ex nat (fun x => x = 3).
+Check sig nat (fun x => x = 3).
 
-Notation "'exists' x : A , p" := (ex A (fun x : A => p)) (at level 200, x ident).
+Notation "'exists' x : A , p" := (sig A (fun x : A => p)) (at level 200, x ident).
 
 Definition divides d n := exists q : nat, d * q = n.
 
-Lemma div_mul a b : divides a (a * b).
+Lemma div3_15 : divides 3 15.
 Proof.
-exists b.
-apply: refl.
+exists 5.
+apply:erefl.
 Qed.
 
-Require Import Arith.
+Lemma mulnA a b c : a * (b * c) = a * b * c.
+Proof.
+Admitted.
 
 Lemma div_trans a b c : divides a b -> divides b c -> divides a c.
 Proof.
@@ -333,9 +441,8 @@ case: dab. move=> q Eb.
 case: dbc. move=> p Ec.
 exists (q * p).
 rewrite -Ec -Eb.
-Search (_ * _ * _).
-rewrite Nat.mul_assoc.
-apply: refl.
+rewrite mulnA.
+apply: erefl.
 Qed.
 
 
@@ -363,12 +470,12 @@ Lemma andbC a b : andb a b = andb b a.
 Proof.
 case: a.
   case: b.
-    apply: refl.
-    apply: refl.
+    apply: erefl.
+    apply: erefl.
 case: b.
-  apply: refl.
-apply: refl.
-(* ripetitiva no? *)
+  apply: erefl.
+apply: erefl.
+(* ripetitiva no? rifacciamola con il ; *)
 Qed.
 
 (**
@@ -409,7 +516,78 @@ Qed.
 
 (** -------------------------------------------- *)
 
+(** #<div class="slide">#
 
+  ** Dimostriamo (hem programmiamo) il principio di induzione per [nat]
+
+  Se le prove sono programmi, allora abitiamo questo tipo, senza troppo
+  riflettere a cosa significhi.
+*)
+
+Fixpoint rec (P : nat -> Type) (p0 : P 0) (pS : forall n, P n -> P (S n)) (n : nat) : P n :=
+  match n with
+  | O => p0
+  | S q => pS q (rec P p0 pS q)
+  end.
+
+Check rec.
+
+(** Abbiamo ottenuto il principio di induzione! 
+
+    Beh, anche Coq lo sa fare... Infatti non appena uno
+    definisce i tipo [nat] Coq genera questo programma
+    in modo automatico:
+*)
+
+Check nat_rect.
+
+(**
+#<div class="concepts">#
+ Concetti:
+ - I principi di induzione non sono altro che funzioni
+   ricorsive
+ #</div>#
+
+#</div># *)
+
+(** -------------------------------------------- *)
+
+(** #<div class="slide">#
+
+  ** Relazioni induttive (e non)
+
+  Proviamo ora ad esprimere il predicatoXXX\leqXXX
+  per i numeri naturali.
+
+  Abbiamo dues possibilità
+*)
+
+Inductive is_leq (n : nat) : nat -> Type :=
+  | leqO : is_leq n n
+  | leqS : forall m, is_leq n m -> is_leq n (S m).
+
+Lemma test_is_leq : is_leq 4 6.
+Proof.
+apply: leqS.
+apply: leqS.
+apply: leqO.
+Qed.
+
+Fixpoint leq (n m : nat) : bool :=
+  match n with
+  | O => true
+  | S a => match m with
+           | O => false
+           | S b => leq a b
+           end
+  end.
+
+Lemma test_leq : leq 4 6 = true.
+Proof.
+apply: erefl.
+Qed.
+
+(** #</div># *)
 
 (** #<div class='slide'>#
 ** Esercizi 
@@ -422,29 +600,84 @@ Qed.
 
 Lemma scrambled A B C : (A /\ B) /\ C -> (C /\ A) /\ B.
 Proof.
-apply: (fun x =>
-  match x with
-  | conj (conj a b) c => conj (conj c a) b
-  end).
+(*D*)apply: (fun x =>
+(*D*)  match x with
+(*D*)  | conj (conj a b) c => conj (conj c a) b
+(*D*)  end).
 Qed.
+
+(** 
+#
+<button onclick="hide('sol1')">Soluzione</button>
+<div id='sol1' class='solution'>
+<pre>
+apply: (fun x =>
+match x with
+| conj (conj a b) c => conj (conj c a) b
+end).
+</pre>
+</div>
+#
+*)
 
 Lemma eggs P Q R : (P \/ Q -> R) -> Q -> R.
 Proof.
-apply: (fun f q => f (right q)).
+(*D*)apply: (fun f q => f (right q)).
 Qed.
+
+(** 
+#
+<button onclick="hide('sol2')">Soluzione</button>
+<div id='sol2' class='solution'>
+<pre>
+apply: (fun f q => f (right q)).
+</pre>
+</div>
+#
+*)
 
 Lemma DM P Q : (~ P /\ ~ Q) -> ~ (P \/ Q).
 Proof.
-move=> npnq. case: npnq => np nq.
-move=> poq. case: poq. apply: np. apply: nq.
+(*D*)move=> npnq. case: npnq => np nq.
+(*D*)move=> poq. case: poq. apply: np. apply: nq.
 Qed.
 
-(* link to wikipedia *)
+(** 
+#
+<button onclick="hide('sol3')">Soluzione</button>
+<div id='sol3' class='solution'>
+<pre>
+move=> npnq. case: npnq => np nq.
+move=> poq. case: poq. apply: np. apply: nq.
+</pre>
+</div>
+#
+*)
+
+(** #<a href="https://en.m.wikipedia.org/wiki/Peirce's_law">La formula di Peirce</a># 
+
+ - Suggerimento: scegliere per [Q] una formula falsa!
+*)
 
 Lemma Peirce :
   (forall Q P, (((P -> Q) -> P) -> P)) ->
   (forall P, P \/ ~ P).
 Proof.
+(*D*)move=> cc P.
+(*D*)apply: (cc False).
+(*D*)move=> truth.
+(*D*)apply: right.
+(*D*)move=> p.
+(*D*)apply: truth.
+(*D*)apply: left.
+(*D*)apply: p.
+Qed.
+ 
+(** 
+#
+<button onclick="hide('sol4')">Soluzione</button>
+<div id='sol4' class='solution'>
+<pre>
 move=> cc P.
 apply: (cc False).
 move=> truth.
@@ -453,11 +686,13 @@ move=> p.
 apply: truth.
 apply: left.
 apply: p.
-Qed.
- 
+</pre>
+</div>
+#
+*)
 
 (** -------------------------------------------- *)
-(** Dimostrare che [orb] è commutativo *)
+(** ** Dimostrare che [orb] è commutativo *)
 
 Definition orb b1 b2 :=
   match b1 with
@@ -467,32 +702,123 @@ Definition orb b1 b2 :=
 
 Lemma orbC b1 b2 : orb b1 b2 = orb b2 b1.
 Proof.
-case: b1; case: b2; apply: refl.
+(*D*)case: b1; case: b2; apply: erefl.
 Qed.
-
-(** -------------------------------------------- *)
-(** Dimostrare che [orb] è associativo *)
-
-Lemma orbA b1 b2 b3 : orb b1 (orb b2 b3) = orb (orb b1 b2) b3.
-Proof.
-case: b1; case: b2; case: b3; apply: refl.
-Qed.
-
-(** -------------------------------------------- *)
-(** Dimostrare il seguente lemma *)
-
-Lemma EMb b : orb b (negb b) = true.
-Proof.
-case: b; apply: refl.
-Qed.
-
 
 (** 
 #
-<button onclick="hide('sol1')">Solution</button>
-<div id='sol1' class='solution'>
+<button onclick="hide('sol5')">Soluzione</button>
+<div id='sol5' class='solution'>
 <pre>
-...
+case: b1; case: b2; apply: erefl.
+</pre>
+</div>
+#
+*)
+
+(** -------------------------------------------- *)
+(** ** Dimostrare che [orb] è associativo *)
+
+Lemma orbA b1 b2 b3 : orb b1 (orb b2 b3) = orb (orb b1 b2) b3.
+Proof.
+(*D*) case: b1; case: b2; case: b3; apply: erefl.
+Qed.
+
+(** 
+#
+<button onclick="hide('sol6')">Soluzione</button>
+<div id='sol6' class='solution'>
+<pre>
+case: b1; case: b2; case: b3; apply: erefl.
+</pre>
+</div>
+#
+*)
+
+(** -------------------------------------------- *)
+(** ** Dimostrare il seguente lemma *)
+
+Lemma EMb b : orb b (negb b) = true.
+Proof.
+(*D*)case: b; apply: erefl.
+Qed.
+
+(** 
+#
+<button onclick="hide('sol7')">Soluzione</button>
+<div id='sol7' class='solution'>
+<pre>
+case: b; apply: erefl.
+</pre>
+</div>
+#
+*)
+
+
+(** -------------------------------------------- *)
+(** ** Dimostra la seguente formula 
+
+XXX
+  m ^ 2 - n ^ 2 =  (m - n) * (m + n)
+XXX
+
+   Usare solo la riscrittura [rewrite]
+   e i seguenti simboli e lemmi che sono forniti
+
+*)
+
+Variable subn : nat -> nat -> nat.
+Infix "-" := subn.
+Variable expn : nat -> nat -> nat.
+Infix "^" := expn.
+Lemma mulnBl (x y z : nat) : (x - y) * z = x * z - y * z. Admitted.
+Lemma mulnDr (x y z : nat) : x * (y + z) = x * y + x * z. Admitted.
+Lemma addnC (x y : nat) : x + y = y + x. Admitted.
+Lemma mulnC (x y : nat) : x * y = y * x. Admitted.
+Lemma subnDl (p m n : nat) : p + m - (p + n) = m - n. Admitted.
+Lemma mulnn n : n * n = n ^ 2. Admitted.
+
+
+(** Traccia della prova
+<<
+m ^ 2 - n ^ 2 = (m - n) * (m + n)
+          .. = m * (m + n) - n * (m + n)
+          .. = m * m + m * n - n * (m + n)
+          .. = m * m + m * n - (n * m + n * n)
+          .. = m * n + m * m - (n * m + n * n)
+          .. = n * m + m * m - (n * m + n * n)
+          .. = m * m - n * n
+          .. = m ^ 2 - n * n
+          .. = m ^ 2 - n ^ 2
+>> *)
+
+Lemma subn_sqr m n : m ^ 2 - n ^ 2 = (m - n) * (m + n).
+Proof.
+(*D*)rewrite mulnBl.
+(*D*)rewrite mulnDr.
+(*D*)rewrite mulnDr.
+(*D*)rewrite addnC.
+(*D*)rewrite mulnC.
+(*D*)rewrite subnDl.
+(*D*)rewrite mulnn.
+(*D*)rewrite mulnn.
+(*D*)apply: erefl.
+Qed.
+
+(** 
+#
+<button onclick="hide('sol8')">Soluzione</button>
+<div id='sol8' class='solution'>
+<pre>
+rewrite mulnBl.
+rewrite mulnDr.
+rewrite mulnDr.
+rewrite addnC.
+rewrite mulnC.
+rewrite subnDl.
+rewrite mulnn.
+rewrite mulnn.
+apply: erefl.
 </pre>
 </div>
 #
