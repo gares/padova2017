@@ -597,9 +597,12 @@ Check sig.
 
 Check (fun x : nat => x = 3).
 
-Check sig nat (fun x => x = 3).
+Arguments sig {_} _.
+Arguments sigI {_ _} _ _.
 
-Notation "'exists' x : A , p" := (sig A (fun x : A => p)) (at level 200, x ident).
+Check sig (fun x => x = 3).
+
+Notation "'exists' x : A , p" := (sig (fun x : A => p)) (at level 200, x ident).
 
 Definition divides d n := exists q : nat, d * q = n.
 
@@ -626,24 +629,6 @@ Qed.
 
 </textarea></div>
 <div><p>
- <div class="concepts">
- Concetti:
-<p>
-<ul class="doclist">
-  <li> <tt>exists T P</tt> non è altro che <tt>/\</tt> ovvero la coppia
-   ma dove il tipo della seconda componente dipende dal
-   valore della prima
-
-  </li>
-<li> lo dimostriamo col comando <tt>exists</tt> (senza i <tt>:</tt>)
-
-</li>
-<li> lo usiamo con <tt>case:</tt>
-
-</li>
-</ul>
- </div>
-<p>
 </div> <p>
 <hr/>
  <p>
@@ -689,12 +674,87 @@ Qed.
  <p>
  <div class='slide'> 
 <h2>
+ Discriminazione dei costruttori e sotto tipi
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> definiamo il tipo dei numeri naturali positivi
+
+  </li>
+<li> usiamolo per programmare la funzione <tt>pred</tt>
+
+</li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-26'>
+
+Definition positivo := exists n : nat, ~ n=0.
+
+Definition pred (x : positivo) : nat.
+Proof.
+case: x.
+move=> n.
+case: n.
+  move=> abs.
+  apply: (ex_falso nat).
+  apply: abs.
+  apply: erefl.
+move=> p _.
+apply: p.
+Defined.
+
+</textarea></div>
+<div><p>
+Dobbiamo dimostrare che, per sempio, <tt>~ 3 = 0</tt>,
+    per applciare <tt>pred</tt> a <quote>3</quote>
+</div>
+<div><textarea id='coq-ta-27'>
+
+Lemma not_3_0 : ~ (3 = 0).
+Proof.
+move=> E.
+change (match 3 with O => True | S _ => False end).
+rewrite E.
+apply: I.
+Qed.
+
+Definition n3p : positivo := sigI 3 not_3_0.
+
+Eval compute -[not] in pred n3p.
+
+</textarea></div>
+<div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>sig</tt> rappresenta un sotto tipo
+
+  </li>
+<li> <tt>sigI</tt> è come <tt>pair</tt>, raggruppa due termini
+   e possiamo usarlo per scrivere programmi
+
+</li>
+<li> <tt>change tipo</tt> per cambiare la forma del goal
+   corrente con una convertibile
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
  Prove all'avanti
 </h2>
 
 <p>
 </div>
-<div><textarea id='coq-ta-26'>
+<div><textarea id='coq-ta-28'>
 
 Lemma fwd P Q :
   (P -> Q) -> P -> ~Q -> 0 = 1.
@@ -732,7 +792,7 @@ Qed.
   Se le prove sono programmi, allora abitiamo questo tipo, senza troppo
   riflettere a cosa significhi.
 </div>
-<div><textarea id='coq-ta-27'>
+<div><textarea id='coq-ta-29'>
 
 Fixpoint rec (P : nat -> Type) (p0 : P 0) (pS : forall n, P n -> P (S n)) (n : nat) : P n :=
   match n with
@@ -750,7 +810,7 @@ Abbiamo ottenuto il principio di induzione!
     definisce i tipo <tt>nat</tt> Coq genera questo programma
     in modo automatico:
 </div>
-<div><textarea id='coq-ta-28'>
+<div><textarea id='coq-ta-30'>
 
 Check nat_rect.
 
@@ -782,7 +842,7 @@ Check nat_rect.
 <p>
   Abbiamo dues possibilità
 </div>
-<div><textarea id='coq-ta-29'>
+<div><textarea id='coq-ta-31'>
 
 Inductive is_leq (n : nat) : nat -> Type :=
   | leqO : is_leq n n
@@ -811,7 +871,23 @@ Qed.
 
 </textarea></div>
 <div><p>
-</div> <p>
+</div> <hr/>
+  <div class="slide"> <p>
+<h3>
+ Link utili:
+</h3>
+
+<p>
+<ul class="doclist">
+  <li> <a href="https://hal.inria.fr/inria-00258384">manuale</a> del linguaggio di prova
+
+  </li>
+<li> <a href="http://www-sop.inria.fr/marelle/math-comp-tut-16/MathCompWS/basic-cheatsheet.pdf">cheat-sheet</a>
+
+</li>
+</ul>
+<p>
+ </div> <p>
  <div class='slide'>
 <h2>
  Esercizi
@@ -820,9 +896,11 @@ Qed.
 <p>
 <p>
 <hr/>
-  Abitare i seguenti tipi (in un colpo solo o con dei
-    comandi di prova) </div>
-<div><textarea id='coq-ta-30'>
+ <h2>
+ Abitare i seguenti tipi (in un colpo solo o con dei comandi di prova)
+</h2>
+</div>
+<div><textarea id='coq-ta-32'>
 
 Lemma scrambled A B C : (A /\ B) /\ C -> (C /\ A) /\ B.
 Proof.
@@ -847,7 +925,7 @@ end).
 </div>
 
 </div>
-<div><textarea id='coq-ta-31'>
+<div><textarea id='coq-ta-33'>
 
 Lemma eggs P Q R : (P \/ Q -> R) -> Q -> R.
 Proof.
@@ -866,7 +944,7 @@ apply: (fun f q => f (right q)).
 </div>
 
 </div>
-<div><textarea id='coq-ta-32'>
+<div><textarea id='coq-ta-34'>
 
 Lemma DM P Q : (~ P /\ ~ Q) -> ~ (P \/ Q).
 Proof.
@@ -895,7 +973,7 @@ move=> poq. case: poq. apply: np. apply: nq.
   </li>
 </ul>
 </div>
-<div><textarea id='coq-ta-33'>
+<div><textarea id='coq-ta-35'>
 
 Lemma Peirce :
   (forall Q P, (((P -> Q) -> P) -> P)) ->
@@ -935,7 +1013,7 @@ apply: p.
  Dimostrare che <tt>orb</tt> è commutativo
 </h2>
 </div>
-<div><textarea id='coq-ta-34'>
+<div><textarea id='coq-ta-36'>
 
 Definition orb b1 b2 :=
   match b1 with
@@ -965,7 +1043,7 @@ case: b1; case: b2; apply: erefl.
  Dimostrare che <tt>orb</tt> è associativo
 </h2>
 </div>
-<div><textarea id='coq-ta-35'>
+<div><textarea id='coq-ta-37'>
 
 Lemma orbA b1 b2 b3 : orb b1 (orb b2 b3) = orb (orb b1 b2) b3.
 Proof.
@@ -989,7 +1067,7 @@ case: b1; case: b2; case: b3; apply: erefl.
  Dimostrare il seguente lemma
 </h2>
 </div>
-<div><textarea id='coq-ta-36'>
+<div><textarea id='coq-ta-38'>
 
 Lemma EMb b : orb b (negb b) = true.
 Proof.
@@ -1022,7 +1100,7 @@ XXX
    e i seguenti simboli e lemmi che sono forniti
 <p>
 </div>
-<div><textarea id='coq-ta-37'>
+<div><textarea id='coq-ta-39'>
 
 Variable subn : nat -> nat -> nat.
 Infix "-" := subn.
@@ -1039,7 +1117,7 @@ Lemma mulnn n : n * n = n ^ 2. Admitted.
 <div><p>
 Traccia della prova
 <pre>
-m ^ 2 - n ^ 2 = (m - n) * (m + n)
+(m - n) * (m + n) =
           .. = m * (m + n) - n * (m + n)
           .. = m * m + m * n - n * (m + n)
           .. = m * m + m * n - (n * m + n * n)
@@ -1050,9 +1128,9 @@ m ^ 2 - n ^ 2 = (m - n) * (m + n)
           .. = m ^ 2 - n ^ 2
 </pre>
  </div>
-<div><textarea id='coq-ta-38'>
+<div><textarea id='coq-ta-40'>
 
-Lemma subn_sqr m n : m ^ 2 - n ^ 2 = (m - n) * (m + n).
+Lemma subn_sqr m n : (m - n) * (m + n) = m ^ 2 - n ^ 2.
 Proof.
 (* completa... *)
 (* completa... *)
@@ -1183,7 +1261,7 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-39'>
+<div><textarea id='coq-ta-41'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
@@ -1195,7 +1273,8 @@ window.onscroll = update_scrolled;
                   'coq-ta-25',  'coq-ta-26',  'coq-ta-27',  'coq-ta-28', 
                   'coq-ta-29',  'coq-ta-30',  'coq-ta-31',  'coq-ta-32', 
                   'coq-ta-33',  'coq-ta-34',  'coq-ta-35',  'coq-ta-36', 
-                  'coq-ta-37',  'coq-ta-38',  'coq-ta-39'];
+                  'coq-ta-37',  'coq-ta-38',  'coq-ta-39',  'coq-ta-40', 
+                  'coq-ta-41'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->

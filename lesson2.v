@@ -418,9 +418,12 @@ Check sig.
 
 Check (fun x : nat => x = 3).
 
-Check sig nat (fun x => x = 3).
+Arguments sig {_} _.
+Arguments sigI {_ _} _ _.
 
-Notation "'exists' x : A , p" := (sig A (fun x : A => p)) (at level 200, x ident).
+Check sig (fun x => x = 3).
+
+Notation "'exists' x : A , p" := (sig (fun x : A => p)) (at level 200, x ident).
 
 Definition divides d n := exists q : nat, d * q = n.
 
@@ -445,18 +448,7 @@ rewrite mulnA.
 apply: erefl.
 Qed.
 
-
-(**
- #<div class="concepts">#
- Concetti:
- - [exists T P] non è altro che [/\] ovvero la coppia
-   ma dove il tipo della seconda componente dipende dal
-   valore della prima
- - lo dimostriamo col comando [exists] (senza i [:])
- - lo usiamo con [case:]
- #</div>#
-
-#</div># *)
+(** #</div># *)
 
 (** -------------------------------------------- *)
 
@@ -484,6 +476,60 @@ Qed.
  - [case:] funziona anche su termini che rappresentano
    dati, come [bool] e [nat]
  - [;] per combinare 2 comandi di prova
+ #</div>#
+
+#</div># *)
+
+
+(** -------------------------------------------- *)
+
+(** #<div class='slide'># 
+** Discriminazione dei costruttori e sotto tipi
+
+   - definiamo il tipo dei numeri naturali positivi
+   - usiamolo per programmare la funzione [pred]
+
+*)
+
+Definition positivo := exists n : nat, ~ n=0.
+
+Definition pred (x : positivo) : nat.
+Proof.
+case: x.
+move=> n.
+case: n.
+  move=> abs.
+  apply: (ex_falso nat).
+  apply: abs.
+  apply: erefl.
+move=> p _.
+apply: p.
+Defined.
+
+(** Dobbiamo dimostrare che, per sempio, [~ 3 = 0],
+    per applciare [pred] a "3"
+*)
+
+Lemma not_3_0 : ~ (3 = 0).
+Proof.
+move=> E.
+change (match 3 with O => True | S _ => False end).
+rewrite E.
+apply: I.
+Qed.
+
+Definition n3p : positivo := sigI 3 not_3_0.
+
+Eval compute -[not] in pred n3p.
+
+(**
+ #<div class="concepts">#
+ Concetti:
+ - [sig] rappresenta un sotto tipo
+ - [sigI] è come [pair], raggruppa due termini
+   e possiamo usarlo per scrivere programmi
+ - [change tipo] per cambiare la forma del goal
+   corrente con una convertibile
  #</div>#
 
 #</div># *)
@@ -588,6 +634,16 @@ apply: erefl.
 Qed.
 
 (** #</div># *)
+(** -------------------------------------------- *)
+(** #<div class="slide"># *)
+
+(** *** Link utili:
+    - #<a href="https://hal.inria.fr/inria-00258384">manuale</a># del linguaggio di prova
+    - #<a href="http://www-sop.inria.fr/marelle/math-comp-tut-16/MathCompWS/basic-cheatsheet.pdf">cheat-sheet</a>#
+*)
+
+(** #</div># *)
+
 
 (** #<div class='slide'>#
 ** Esercizi 
@@ -595,8 +651,7 @@ Qed.
 *)
 
 (** -------------------------------------------- *)
-(** Abitare i seguenti tipi (in un colpo solo o con dei
-    comandi di prova) *)
+(** ** Abitare i seguenti tipi (in un colpo solo o con dei comandi di prova) *)
 
 Lemma scrambled A B C : (A /\ B) /\ C -> (C /\ A) /\ B.
 Proof.
@@ -781,7 +836,7 @@ Lemma mulnn n : n * n = n ^ 2. Admitted.
 
 (** Traccia della prova
 <<
-m ^ 2 - n ^ 2 = (m - n) * (m + n)
+(m - n) * (m + n) =
           .. = m * (m + n) - n * (m + n)
           .. = m * m + m * n - n * (m + n)
           .. = m * m + m * n - (n * m + n * n)
@@ -792,7 +847,7 @@ m ^ 2 - n ^ 2 = (m - n) * (m + n)
           .. = m ^ 2 - n ^ 2
 >> *)
 
-Lemma subn_sqr m n : m ^ 2 - n ^ 2 = (m - n) * (m + n).
+Lemma subn_sqr m n : (m - n) * (m + n) = m ^ 2 - n ^ 2.
 Proof.
 (*D*)rewrite mulnBl.
 (*D*)rewrite mulnDr.
