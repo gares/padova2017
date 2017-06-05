@@ -5,7 +5,7 @@
 
     <link rel="stylesheet" href="jscoq/ui-external/bootstrap.min.css" />
 
-<title>lesson3</title><script type='text/javascript' src='MathJax-2.7.1/unpacked/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
+<title>lesson3</title><script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML'> </script> <script type='text/javascript'> MathJax.Hub.Config({ 'HTML-CSS': { preferredFont: 'STIX' }, tex2jax: { inlineMath: [['XXX','XXX']] } }); </script>
 <link rel="stylesheet" href="local.css" />
   </head>
 
@@ -17,23 +17,587 @@
 <div><textarea id='coq-ta-1'>
 
 From mathcomp Require Import ssreflect.
-Require Import lesson1.
-Require Import lesson2.
-
-Lemma addnC a b : a + b = b + a.
-Admitted.
-
-Lemma addnA a b c : a + (b + c) = a + b + c.
-Admitted.
-
-Lemma add0n n : 0 + n = n.
-Admitted.
-
-Lemma addn0 n : n + 0 = n.
-Admitted.
+Notation erefl := refl_equal.
+Notation addn := plus.
+Notation muln := Nat.mul.
+Open Scope list_scope.
 
 </textarea></div>
 <div><p>
+<div class='slide'> 
+<h2>
+ Discriminazione dei costruttori e sotto tipi
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> definiamo il tipo dei numeri naturali positivi
+
+  </li>
+<li> usiamolo per programmare la funzione <tt>pred</tt>
+
+</li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-2'>
+
+Definition positivo := { n : nat | ~ n = 0 }.
+Locate "{ _ | _ }".
+Print sig.
+
+Lemma ex_falso P : False -> P.
+Proof. move=> abs. case: abs. Qed.
+
+Definition pred (x : positivo) : nat.
+Proof.
+case: x.
+move=> n.
+case: n.
+  move=> abs.
+  apply: ex_falso.
+  apply: abs.
+  apply: erefl.
+move=> p _.
+apply: p.
+Defined.
+
+</textarea></div>
+<div><p>
+Dobbiamo dimostrare che, per sempio, <tt>~ 3 = 0</tt>,
+    per applciare <tt>pred</tt> a <quote>3</quote>
+</div>
+<div><textarea id='coq-ta-3'>
+
+Lemma not_3_0 : ~ (3 = 0).
+Proof.
+move=> E.
+change (match 3 with O => True | S _ => False end).
+rewrite E.
+apply: I.
+Qed.
+
+Definition n3p : positivo := exist _ 3 not_3_0.
+
+Eval compute in pred n3p.
+
+</textarea></div>
+<div><p>
+ <div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>sig</tt> rappresenta un sotto tipo
+
+  </li>
+<li> <tt>eixists</tt> (il costruttore di sig) è come <tt>pair</tt>, raggruppa due termini
+   e possiamo usarlo per scrivere programmi
+
+</li>
+<li> <tt>change tipo</tt> per cambiare la forma del goal
+   corrente con una convertibile
+
+</li>
+<li> dimostrare che 2 costruttori sono diversi
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Prove all'avanti
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-4'>
+
+Lemma fwd P Q :
+  (P -> Q) -> P -> (Q -> False) -> 0 = 1.
+Proof.
+move=> p2q p nq.
+have q : Q.
+  apply: p2q. apply: p.
+have abs : False.
+  apply: nq. apply q.
+case: abs.
+Qed.
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>have nome : tipo</tt> inizia una sottoprova
+
+  </li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide vfill'>  
+<h2>
+ Lezione 3
+</h2>
+
+<p>
+<ul class="doclist">
+  <li> Induzione
+<ul class="doclist">
+    <li> programmiamo il principio per nat
+
+    </li>
+  <li> prove per induzione su nat
+
+  </li>
+  <li> accumulatori e generalizzazione
+
+  </li>
+  <li> prove per induzione su liste
+<p>
+  
+  </li>
+  </ul>
+  
+  </li>
+<li> Esercizi
+
+</li>
+</ul>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class="slide">
+<p>
+<h2>
+ Dimostriamo (hem programmiamo) il principio di induzione per <tt>nat</tt>
+</h2>
+
+<p>
+  Se le prove sono programmi, allora abitiamo questo tipo, senza troppo
+  riflettere a cosa significhi.
+</div>
+<div><textarea id='coq-ta-5'>
+
+Fixpoint rec (P : nat -> Type)
+    (p0 : P 0) (pS : forall n, P n -> P (S n)) (n : nat) : P n
+:=
+  match n with
+  | O => p0
+  | S q => pS q (rec P p0 pS q)
+  end.
+
+Check rec.
+
+</textarea></div>
+<div><p>
+Abbiamo ottenuto il principio di induzione! 
+<p>
+    Beh, anche Coq lo sa fare... Infatti non appena uno
+    definisce il tipo <tt>nat</tt> Coq genera questo programma
+    in modo automatico:
+</div>
+<div><textarea id='coq-ta-6'>
+
+Check nat_rect.
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> I principi di induzione non sono altro che funzioni
+   ricorsive
+
+  </li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class="slide">
+<h2>
+ La prima prova per induzione
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-7'>
+
+Lemma addn0 n: n + 0 = n.
+Proof.
+elim: n.
+  apply: erefl.
+move=> p IHp.
+rewrite /= IHp.
+apply: erefl.
+Qed.
+
+Print muln. Print Nat.mul.
+
+Lemma muln0 n : n * 0 = 0.
+Proof.
+elim: n.
+  by [].
+move=> p IHp.
+by rewrite /= IHp.
+Qed.
+
+Lemma addnS n m : n + S m = S (n + m).
+Proof.
+elim: n.
+  by [].
+move=> p IHp /=.
+by rewrite IHp.
+Qed.
+
+Lemma addnC n m : n + m = m + n.
+Proof.
+elim: n.
+  by rewrite addn0 /=.
+move=> p IHp /=.
+by rewrite IHp addnS.
+Qed.
+
+Lemma addnA a b c : a + (b + c) = a + b + c.
+Admitted. (* Esercizio *)
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>elim: n</tt> per iniziare l'induzione
+
+  </li>
+<li> <tt>rewrite /=</tt> per calcolare all'avanti
+
+</li>
+<li> <tt>... => nomi</tt>
+
+</li>
+<li> <tt>... => //</tt>
+
+</li>
+<li> <tt>... => /=</tt>
+
+</li>
+<li> <tt>by ...</tt> per terminare un comando di prova
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class="slide">
+<h2>
+ Accumulatori e generalizzazione
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-8'>
+
+Fixpoint append {A} l1 l2 : list A :=
+  match l1 with
+  | nil => l2
+  | x :: xs => x :: append xs l2
+  end.
+
+Fixpoint rev {A} l : list A :=
+  match l with
+  | nil => nil
+  | x :: xs => append (rev xs) (x :: nil)
+  end.
+
+Fixpoint fold {A B} (f : A -> B -> B) (l : list A) (b : B) : B :=
+  match l with
+  | nil => b
+  | x :: xs => fold f xs (f x b)
+  end.
+
+Lemma fold_append1 x l acc :
+  fold addn (append l (x :: nil)) acc = fold addn l (addn x acc).
+Proof.
+elim: l acc => //= y ys IH acc.
+by rewrite IH addnA (addnC x) addnA.
+Qed.
+
+Lemma fold_add l : fold addn l 0 = fold addn (rev l) 0.
+Proof.
+elim: l 0 => //= x xs IH acc.
+by rewrite IH fold_append1.
+Qed.
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>=> //=</tt> per semplificare e eliminare goal triviali
+
+  </li>
+<li> <tt>elim: main gens</tt> per generalizzare prima di fare l'induzione
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<hr/>
+ <p>
+ <div class="slide">
+<h2>
+ Indici e inversione
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-9'>
+
+Inductive is_leq (n : nat) : nat -> Type :=
+  | leq_nn : is_leq n n
+  | leq_S  : forall m, is_leq n m -> is_leq n (S m).
+
+Infix "<=" := is_leq.
+
+Lemma test_is_leq : 3 <= 5.
+Proof.
+apply: leq_S.
+apply: leq_S.
+apply: leq_nn.
+Qed.
+
+Lemma test_is_leq_hyp n m : S n <= m -> n <= m.
+Proof.
+move=> leq_Snm.
+elim: leq_Snm.
+  by apply: leq_S; apply: leq_nn.
+by move=> a leq_Sna IH; apply: leq_S; apply: IH.
+Qed.
+
+Lemma is_leq0 n : n <= 0 -> n = 0.
+Proof.
+move=> leqn0.
+move: (erefl 0).
+by case: {-1}_ / leqn0.
+Qed.
+
+</textarea></div>
+<div><p>
+<div class="concepts">
+ Concetti:
+<p>
+<ul class="doclist">
+  <li> <tt>move: (term)</tt> per generare una equazione
+
+  </li>
+<li> <tt>case: {occs}_ / h</tt> per scegliere le occorrenze degli indici
+   di <tt>h</tt> da sostituire
+
+</li>
+</ul>
+ </div>
+<p>
+</div> <p>
+<h3>
+ Link utili:
+</h3>
+
+<p>
+<ul class="doclist">
+  <li> <a href="https://hal.inria.fr/inria-00258384">manuale</a> del linguaggio di prova
+
+  </li>
+<li> <a href="http://www-sop.inria.fr/marelle/math-comp-tut-16/MathCompWS/basic-cheatsheet.pdf">cheat-sheet</a>
+
+</li>
+<li> <a href="https://math-comp.github.io/mcb/">Libro (draft) sulla formalizzazione in Coq</a>
+
+</li>
+</ul>
+<p>
+<hr/>
+ <p>
+ <div class="slide">
+<h2>
+ Esercizi
+</h2>
+
+<p>
+</div>
+<div><textarea id='coq-ta-10'>
+
+Lemma addnA1 a b c : a + (b + c) = a + b + c.
+Proof.
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol1')">Soluzione</button>
+<div id='sol1' class='solution'>
+<pre>
+by elim: a => //= p -> .
+</pre>
+</div>
+
+Note: se si da il nome <tt>-></tt> a una ipotesi equazionale, allora
+la si sostituisce al volo.
+<p>
+</div>
+<div><textarea id='coq-ta-11'>
+
+Lemma appendA A (l1 l2 l3 : list A) :
+  append l1 (append l2 l3) = append (append l1 l2) l3.
+Proof.
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol2')">Soluzione</button>
+<div id='sol2' class='solution'>
+<pre>
+by elim: l1 => //= x xs ->.
+</pre>
+</div>
+
+</div>
+<div><textarea id='coq-ta-12'>
+
+Lemma append_nil A (l : list A) : append l nil = l.
+Proof.
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol3')">Soluzione</button>
+<div id='sol3' class='solution'>
+<pre>
+by elim: l => //= x xs ->.
+</pre>
+</div>
+
+</div>
+<div><textarea id='coq-ta-13'>
+
+Lemma append_cons A (l : list A) x xs :
+  append l (x :: xs) = append (append l (x :: nil)) xs.
+Proof.
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol3x')">Soluzione</button>
+<div id='sol3x' class='solution'>
+<pre>
+by elim: l => //= y ys ->.
+</pre>
+</div>
+
+</div>
+<div><textarea id='coq-ta-14'>
+
+Lemma rev_append A (l1 l2 : list A) : 
+  rev (append l1 l2) = append (rev l2) (rev l1).
+Proof.
+(* completa... *)
+(* completa... *)
+(* completa... *)
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol4')">Soluzione</button>
+<div id='sol4' class='solution'>
+<pre>
+elim: l1.
+  by rewrite /= append_nil.
+move=> x xs /= ->.
+by rewrite appendA.
+</pre>
+</div>
+
+</div>
+<div><textarea id='coq-ta-15'>
+
+Lemma revI A (l : list A) : rev (rev l) = l.
+Proof.
+(* completa... *)
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol5')">Soluzione</button>
+<div id='sol5' class='solution'>
+<pre>
+elim: l => //= x xs IH .
+by rewrite rev_append /= IH.
+</pre>
+</div>
+
+<p>
+ In questo esercizio, prima di iniziare la prova bisogna
+    capire quale invariante serve dimostrare.  In partcolare
+    l'accumulatore nil (da generalizzare come ben sapete) non
+    compare a destra. E questo è il problema che dovere risolvere...
+    E la soluzione è uno dei lemmi che avete dimostrato prima! </div>
+<div><textarea id='coq-ta-16'>
+
+Lemma fold_rev A (l : list A) : fold cons l nil = rev l.
+Proof.
+(* completa... *)
+(* completa... *)
+(* completa... *)
+Qed.
+
+</textarea></div>
+<div><p>
+<p>
+
+<button onclick="hide('sol5x')">Soluzione</button>
+<div id='sol5x' class='solution'>
+<pre>
+rewrite -(append_nil A (rev l)).
+elim: l nil => //= x xs IH acc.
+by rewrite IH append_cons.
+</pre>
+</div>
+
+<p>
+ </div> <p>
+<p>
 
 <script>
 alignWithTop = true;
@@ -128,10 +692,14 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-2'>
+<div><textarea id='coq-ta-17'>
 </textarea></div>
 <script type="text/javascript">
- var coqdoc_ids = ['coq-ta-1',  'coq-ta-2'];
+ var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
+                  'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
+                  'coq-ta-9',  'coq-ta-10',  'coq-ta-11',  'coq-ta-12', 
+                  'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16', 
+                  'coq-ta-17'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->
