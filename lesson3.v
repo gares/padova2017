@@ -168,7 +168,6 @@ Admitted. (* Esercizio *)
  - [elim: n] per iniziare l'induzione
  - [rewrite /=] per calcolare all'avanti
  - [... => nomi]
- - [... => //]
  - [... => /=]
  - [by ...] per terminare un comando di prova
  #</div>#
