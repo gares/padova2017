@@ -1,8 +1,6 @@
 
 From mathcomp Require Import ssreflect.
 Notation erefl := refl_equal.
-Notation addn := plus.
-Notation muln := Nat.mul.
 Open Scope list_scope.
 
 
@@ -51,6 +49,9 @@ Definition n3p : positivo := exist _ 3 not_3_0.
 
 Eval compute in pred n3p.
 
+(** Adesso generalizziamo [not_3_0] a [not_Sx_0] perchè
+    ci servirà dopo *)
+
 (**
  #<div class="concepts">#
  Concetti:
@@ -89,15 +90,15 @@ Eval compute in pred n3p.
   riflettere a cosa significhi.
 *)
 
-Fixpoint rec (P : nat -> Type)
-    (p0 : P 0) (pS : forall n, P n -> P (S n)) (n : nat) : P n
+Fixpoint build_vector (vect : nat -> Type)
+    (p0 : vect 0) (pS : forall n, vect n -> vect (S n)) (n : nat) : vect n
 :=
   match n with
   | O => p0
-  | S q => pS q (rec P p0 pS q)
+  | S q => pS q (build_vector vect p0 pS q)
   end.
 
-Check rec.
+Check build_vector.
 
 (** Abbiamo ottenuto il principio di induzione! 
 
@@ -133,7 +134,7 @@ rewrite /= IHp.
 apply: erefl.
 Qed.
 
-Print muln. Print Nat.mul.
+Print Nat.mul.
 
 Lemma muln0 n : n * 0 = 0.
 Proof.
@@ -201,13 +202,13 @@ Fixpoint fold {A B} (f : A -> B -> B) (l : list A) (b : B) : B :=
   end.
 
 Lemma fold_append1 x l acc :
-  fold addn (append l (x :: nil)) acc = fold addn l (addn x acc).
+  fold Nat.add (append l (x :: nil)) acc = fold Nat.add l (x + acc).
 Proof.
 elim: l acc => //= y ys IH acc.
-by rewrite IH addnA (addnC x) addnA.
+by rewrite IH addnA [x + _]addnC addnA.
 Qed.
 
-Lemma fold_add l : fold addn l 0 = fold addn (rev l) 0.
+Lemma fold_add l : fold Nat.add l 0 = fold Nat.add (rev l) 0.
 Proof.
 elim: l 0 => //= x xs IH acc.
 by rewrite IH fold_append1.
@@ -255,8 +256,22 @@ Lemma is_leq0 n : n <= 0 -> n = 0.
 Proof.
 move=> leqn0.
 move: (erefl 0).
-by case: {-1}_ / leqn0.
+by case: {-2}_ / leqn0.
 Qed.
+
+(*
+Definition is_leq0bis n : n <= 0 -> n = 0 :=
+  fun p : n <= 0 =>
+    match p 
+      in is_leq _ i
+      return i = 0 -> n = i
+    with
+    | leq_nn => fun (e : n = 0) => erefl n
+    | leq_S m q => fun (e : S m = 0) =>  (* q : n <= m *)
+         match not_Sx_0 m e with end
+    end
+      (erefl 0).
+*)
 
 (**
 #<div class="concepts">#
@@ -264,6 +279,7 @@ Qed.
  - [move: (term)] per generare una equazione
  - [case: {occs}_ / h] per scegliere le occorrenze degli indici
    di [h] da sostituire
+ - [inversion H] genera l'equazione e fa il [case: ../..] al volo
  #</div>#
 
 #</div># *)
