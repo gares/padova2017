@@ -107,41 +107,6 @@ Eval compute in pred n3p.
 </div> <p>
 <hr/>
  <p>
- <div class='slide'> 
-<h2>
- Prove all'avanti
-</h2>
-
-<p>
-</div>
-<div><textarea id='coq-ta-4'>
-
-Lemma fwd P Q :
-  (P -> Q) -> P -> (Q -> False) -> 0 = 1.
-Proof.
-move=> p2q p nq.
-have q : Q.
-  apply: p2q. apply: p.
-have abs : False.
-  apply: nq. apply q.
-case: abs.
-Qed.
-
-</textarea></div>
-<div><p>
-<div class="concepts">
- Concetti:
-<p>
-<ul class="doclist">
-  <li> <tt>have nome : tipo</tt> inizia una sottoprova
-
-  </li>
-</ul>
- </div>
-<p>
-</div> <p>
-<hr/>
- <p>
  <div class='slide vfill'>  
 <h2>
  Lezione 3
@@ -185,7 +150,7 @@ Qed.
   Se le prove sono programmi, allora abitiamo questo tipo, senza troppo
   riflettere a cosa significhi.
 </div>
-<div><textarea id='coq-ta-5'>
+<div><textarea id='coq-ta-4'>
 
 Fixpoint rec (P : nat -> Type)
     (p0 : P 0) (pS : forall n, P n -> P (S n)) (n : nat) : P n
@@ -205,7 +170,7 @@ Abbiamo ottenuto il principio di induzione!
     definisce il tipo <tt>nat</tt> Coq genera questo programma
     in modo automatico:
 </div>
-<div><textarea id='coq-ta-6'>
+<div><textarea id='coq-ta-5'>
 
 Check nat_rect.
 
@@ -232,7 +197,7 @@ Check nat_rect.
 
 <p>
 </div>
-<div><textarea id='coq-ta-7'>
+<div><textarea id='coq-ta-6'>
 
 Lemma addn0 n: n + 0 = n.
 Proof.
@@ -309,7 +274,7 @@ Admitted. (* Esercizio *)
 
 <p>
 </div>
-<div><textarea id='coq-ta-8'>
+<div><textarea id='coq-ta-7'>
 
 Fixpoint append {A} l1 l2 : list A :=
   match l1 with
@@ -367,7 +332,7 @@ Qed.
 
 <p>
 </div>
-<div><textarea id='coq-ta-9'>
+<div><textarea id='coq-ta-8'>
 
 Inductive is_leq (n : nat) : nat -> Type :=
   | leq_nn : is_leq n n
@@ -440,7 +405,7 @@ Qed.
 
 <p>
 </div>
-<div><textarea id='coq-ta-10'>
+<div><textarea id='coq-ta-9'>
 
 Lemma addnA1 a b c : a + (b + c) = a + b + c.
 Proof.
@@ -462,7 +427,7 @@ Note: se si da il nome <tt>-></tt> a una ipotesi equazionale, allora
 la si sostituisce al volo.
 <p>
 </div>
-<div><textarea id='coq-ta-11'>
+<div><textarea id='coq-ta-10'>
 
 Lemma appendA A (l1 l2 l3 : list A) :
   append l1 (append l2 l3) = append (append l1 l2) l3.
@@ -482,7 +447,7 @@ by elim: l1 => //= x xs ->.
 </div>
 
 </div>
-<div><textarea id='coq-ta-12'>
+<div><textarea id='coq-ta-11'>
 
 Lemma append_nil A (l : list A) : append l nil = l.
 Proof.
@@ -501,7 +466,7 @@ by elim: l => //= x xs ->.
 </div>
 
 </div>
-<div><textarea id='coq-ta-13'>
+<div><textarea id='coq-ta-12'>
 
 Lemma append_cons A (l : list A) x xs :
   append l (x :: xs) = append (append l (x :: nil)) xs.
@@ -521,7 +486,7 @@ by elim: l => //= y ys ->.
 </div>
 
 </div>
-<div><textarea id='coq-ta-14'>
+<div><textarea id='coq-ta-13'>
 
 Lemma rev_append A (l1 l2 : list A) : 
   rev (append l1 l2) = append (rev l2) (rev l1).
@@ -547,7 +512,7 @@ by rewrite appendA.
 </div>
 
 </div>
-<div><textarea id='coq-ta-15'>
+<div><textarea id='coq-ta-14'>
 
 Lemma revI A (l : list A) : rev (rev l) = l.
 Proof.
@@ -573,7 +538,7 @@ by rewrite rev_append /= IH.
     l'accumulatore nil (da generalizzare come ben sapete) non
     compare a destra. E questo è il problema che dovere risolvere...
     E la soluzione è uno dei lemmi che avete dimostrato prima! </div>
-<div><textarea id='coq-ta-16'>
+<div><textarea id='coq-ta-15'>
 
 Lemma fold_rev A (l : list A) : fold cons l nil = rev l.
 Proof.
@@ -692,14 +657,13 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-17'>
+<div><textarea id='coq-ta-16'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
                   'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
                   'coq-ta-9',  'coq-ta-10',  'coq-ta-11',  'coq-ta-12', 
-                  'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16', 
-                  'coq-ta-17'];
+                  'coq-ta-13',  'coq-ta-14',  'coq-ta-15',  'coq-ta-16'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->
