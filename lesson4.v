@@ -209,7 +209,9 @@ Eval compute -[muln] in interp muln 1 example.
 ** Normalizzazione 
 
      Op Identity x --> x
+
      Op x Identity --> x
+
      Op x (Op y z) --> Op (Op x y) z
 
 *)
