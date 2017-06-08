@@ -123,9 +123,11 @@ Open Scope nat_scope.
 (** #</div># *)
 
 (** ----------------------------------- *)
+(** ----------------------------------- *)
 
 (** #<div class='slide'># 
-** 
+** Riflessione computazionale
+
    Bello:
    - nella teoria dei tipi dimostrare [2+3=3+2] è facile,
      o meglio, la dimostrazione è _molto_ corta [apply: erefl]
