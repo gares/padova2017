@@ -1,17 +1,17 @@
 (** #<div class='slide vfill'>#  
 ** Lezione 4
 
- - Riflessione computazionale
-   - idea
-   - normalizzazione nella segnatura di
-     un monoide
-
  - Applicazioni di Coq
    - un compilatore C verificato
    - un libreria di matematica organizzata
      come una libreria di programmi 
 
- - Esercizi
+ - Riflessione computazionale
+   - idea
+   - normalizzazione nella segnatura di
+     un monoide
+
+ - Esercizio
 
 #</div># *)
 
@@ -21,15 +21,119 @@ From mathcomp Require Import all_ssreflect.
 (** ----------------------------------- *)
 
 (** #<div class='slide'># 
+** Applicazione: Compilatore certificato CompCert 
+
+   CompCert è un vero e proprio compilatore C.
+   Il compilatore è scritto in OCaml.
+   Il codice OCaml è extratto da programmi/prove Coq.
+
+   #<a href="http://compcert.inria.fr/">Sito del compilatore</a>#
+
+   Tecniche:
+   - estrazione di programmi da termini Coq
+   - verifica correttezza traccia esterna per riflessione computazionale
+
+*)
+
+Definition positivo := { n : nat | ~ n = 0 }.
+Locate "{ _ | _ }".
+Print sig.
+
+Definition pred (x : positivo) : nat :=
+match x with
+| exist n p =>
+    match n with
+    | O => fun abs : ~ O = O =>
+               match abs (erefl 0) with end
+    | S x => fun _ => x
+    end 
+      (p : ~ n = 0)
+end.
+
+Lemma not_3_0 : ~ (3 = 0).
+Proof.
+move=> E.
+change (match 3 with O => True | S _ => False end).
+rewrite E.
+apply: I.
+Qed.
+
+Definition n3p : positivo := exist _ 3 not_3_0.
+
+Definition e := pred n3p.
+
+(* Extraction Language Haskell. *)
+Recursive Extraction e.
+
+(** Ora proviamo il programma estratto in
+    #<a href="https://try.ocamlpro.com/">OCaml</a># *)
+
+(** #</div># *)
+
+(** ----------------------------------- *)
+
+(** #<div class='slide'># 
+** Applicazione: Verfica di prove di matematica 
+
+   La libreria #<a href="http://math-comp.github.io/math-comp/">Mathematical Components</a>#
+   e il #<a href="https://math-comp.github.io/mcb/">Libro (draft)</a># sulla formalizzazione in Coq
+   di tale libreria.
+
+   Tecniche utilizzate:
+   - riflessione booleana (predicati decidibili = programmi)
+   - programmazione logica (inferenza di tipo à la type-classes)
+
+*)
+
+From mathcomp Require Import all_ssreflect.
+
+Lemma test_tuple A n (t : n.-tuple A):
+  size t = size (rev (map id t)).
+Proof.
+rewrite size_tuple.
+(*
+Check (erefl _ : size (rev (map id (tval t))) = size (tval _)).
+Check rev_tuple.
+Print rev_tuple.
+Check rev_tupleP.
+*)
+rewrite size_tuple.
+by [].
+Qed.
+
+From mathcomp Require Import all_fingroup.
+Open Scope group_scope.
+
+
+Lemma test (gT : finGroupType) (G H : {group gT}) : 1 \in G :&: H.
+Proof.
+Check (G :&: H).
+About group1.
+Check (erefl _ :  (G :&: H) = gval _).
+About setI_group.
+Print setI_group.
+About group_setI.
+change (1 \in gval (setI_group G H)).
+apply: group1.
+Qed.
+
+Close Scope group_scope.
+Open Scope nat_scope.
+
+(** #</div># *)
+
+(** ----------------------------------- *)
+
+(** #<div class='slide'># 
 ** 
    Bello:
    - nella teoria dei tipi dimostrare [2+3=3+2] è facile,
-     o meglio, la dimostrazione è _molto_ corta [apply: refl]
+     o meglio, la dimostrazione è _molto_ corta [apply: erefl]
    - tale dimostrazione non dipende dalla taglia delle espressioni
      coinvolte, ie rimane triviale anche per [2+3+4+5=5+2+3+4]
    Meno bello:
    - il calcollo è completo su termini chiusi, se sono presenti
-     variabili dobbiamo rgionare per induzione o riutilizzare lemmi
+     variabili dobbiamo ragionare per induzione o riutilizzare lemmi
      dimostrati in precendenza, eg [x + 0 = x]
    - la taglia della dimostrazione dipende però dal numero di passi
      da fare, eg [(x + 0) + 0 = x] richiede 2 riscritture
@@ -38,7 +142,7 @@ From mathcomp Require Import all_ssreflect.
    - l'esecuzione di un programma [p] non richiede una prova
      [p x = y]
    - e non importa quanti "passi" di esecuzione [p] faccia
-     la prova di [p x = y] è sempre [refl]
+     la prova di [p x = y] è sempre [erefl]
 
    Idea: potremmo scrivere un programma che "fa la dimostrazione"
    (quando questa è ripetitiva).
@@ -95,6 +199,7 @@ Fixpoint interp {A} op id (m : Syntax A) :=
 
 
 Eval compute -[addn] in interp addn 0 example.
+Eval compute -[muln] in interp muln 1 example.
 
 (** #</div># *)
 
@@ -126,12 +231,6 @@ Fixpoint norm {A} (m : Syntax A) :=
 
 Eval compute -[addn] in interp addn 0 (norm example).
 
-Lemma norm_ok_example :
-  interp addn 0 example = interp addn 0 (norm example).
-Proof.
-apply: (erefl (3+2)).
-Qed.
-
 (** #</div># *)
 
 (** ----------------------------------- *)
@@ -151,12 +250,14 @@ elim: m => //= e1 -> e2 ->.
 by case: (norm e1); case: (norm e2) => /=.
 Qed.
 
-Lemma test x y :
+Lemma test2 x y :
   x + (y + 0) + 0 = x + y.
 Proof.
+rewrite /=.
 pose s := Op (Op (Value x) (Op (Value y) Identity)) Identity.
 change (interp addn 0 s = x+y).
 rewrite (norm_ok addnA add0n addn0).
+rewrite /=.
 apply: erefl.
 Qed.
 
@@ -177,66 +278,66 @@ Qed.
   Soluzione: la funzione di reificazione la scriviamo un
   linguaggio che non è la teoria dei tipi ;-)
 
-  Fortna: non ci interessa dimostrarla corretta, basta
+  Fortuna: non ci interessa dimostrarla corretta, basta
   che lo sia in pratica.
 
 *)
 
-Ltac quote t :=
+Ltac quote op id t :=
   match t with
-  | (?a + ?b) =>
-        let x := quote a in
-        let y := quote b in
+  | (op ?a ?b) =>
+        let x := quote op id a in
+        let y := quote op id b in
         uconstr:(Op x y)
-  | 0 => uconstr:(Identity)
+  | id => uconstr:(Identity)
   | ?x => uconstr:(Value x)
   end.
 
-Ltac monoid :=
+Ltac monoid op id opA idL idR :=
   match goal with
   |- ?a = ?b =>
-      let x := quote a in
-      let y := quote b in 
-      change (interp addn 0 x = interp addn 0 y);
-      rewrite [interp addn 0 x](norm_ok addnA add0n addn0);
-      rewrite [interp addn 0 y](norm_ok addnA add0n addn0);
-      compute -[addn]
+      let x := quote op id a in
+      let y := quote op id b in 
+      change (interp op id x = interp op id y);
+      rewrite [interp op id x](norm_ok opA idL idR);
+      rewrite [interp op id y](norm_ok opA idL idR);
+      compute -[op]
   end.
 
-Lemma test2 x y :
+Lemma test3 x y :
   x + (y + 0) + 0 = 0 + x + y. 
 Proof.
-monoid.
+monoid addn 0 addnA add0n addn0.
+apply: erefl.
+Qed.
+
+Lemma test4 x y :
+  x * (y * 1) = x * y. 
+Proof.
+monoid muln 1 mulnA mul1n muln1.
 apply: erefl.
 Qed.
 
 (** #</div># *)
 
-(** ----------------------------------- *)
-
-(** #<div class='slide'># 
-** Applicazione: Compilatore certificato CompCert 
-*)
-
-(** #</div># *)
-
-(** ----------------------------------- *)
-
-(** #<div class='slide'># 
-** Applicazione: Verfica di prove di matematica 
-*)
-
-(** #</div># *)
-
-(** ----------------------------------- *)
-
 (** #<div class='slide'># 
 ** Esercizio: 
 
    aggiungere un elemento assorbente
-   al monoide (sintassi, interpretazione, normalizzazione
-   e prova di correttezza) 
+   al monoide (sintassi, interpretazione, normalizzazione,
+   prova di correttezza, codice [quote] e codice [monoid]) 
 *)
+
+
+Lemma esercizio x y :
+  x * (y * 1) * 0 = x * 0. 
+Proof.
+(* questa prova deve funzionare:
+monoid muln 1 0 mulnA mul1n muln1 mul0n muln0.
+apply: erefl.
+Qed.
+*)
+Admitted.
 
 (** 
 #
@@ -295,6 +396,29 @@ move=> opA idL idR abdL absR m.
 elim: m => //= e1 -> e2 ->.
 case: (norm e1); case: (norm e2) => //=.
 Qed.
+
+Ltac quote op id abs t :=
+  match t with
+  | (op ?a ?b) =>
+        let x := quote op id abs a in
+        let y := quote op id abs b in
+        uconstr:(Op x y)
+  | id => uconstr:(Identity)
+  | abs => uconstr:(Annihilator)
+  | ?x => uconstr:(Value x)
+  end.
+
+Ltac monoid op id abs opA idL idR absL absR :=
+  match goal with
+  |- ?a = ?b =>
+      let x := quote op id abs a in
+      let y := quote op id abs b in 
+      change (interp op id abs x = interp op id abs y);
+      rewrite [interp op id abs x](norm_ok opA idL idR absL absR);
+      rewrite [interp op id abs y](norm_ok opA idL idR absL absR);
+      compute -[op]
+  end.
+
 </pre>
 </div>
 #

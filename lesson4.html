@@ -24,33 +24,33 @@
 
 <p>
 <ul class="doclist">
-  <li> Riflessione computazionale
+  <li> Applicazioni di Coq
 <ul class="doclist">
-    <li> idea
+    <li> un compilatore C verificato
 
     </li>
-  <li> normalizzazione nella segnatura di
-     un monoide
+  <li> un libreria di matematica organizzata
+     come una libreria di programmi 
 <p>
   
   </li>
   </ul>
   
   </li>
-<li> Applicazioni di Coq
+<li> Riflessione computazionale
 <ul class="doclist">
-  <li> un compilatore C verificato
+  <li> idea
 
   </li>
-<li> un libreria di matematica organizzata
-     come una libreria di programmi 
+<li> normalizzazione nella segnatura di
+     un monoide
 <p>
 
 </li>
 </ul>
 
 </li>
-<li> Esercizi
+<li> Esercizio
 
 </li>
 </ul>
@@ -66,6 +66,132 @@ From mathcomp Require Import all_ssreflect.
  <p>
  <div class='slide'> 
 <h2>
+ Applicazione: Compilatore certificato CompCert
+</h2>
+
+<p>
+   CompCert è un vero e proprio compilatore C.
+   Il compilatore è scritto in OCaml.
+   Il codice OCaml è extratto da programmi/prove Coq.
+<p>
+   <a href="http://compcert.inria.fr/">Sito del compilatore</a>
+<p>
+   Tecniche:
+<p>
+<ul class="doclist">
+  <li> estrazione di programmi da termini Coq
+
+  </li>
+<li> verifica correttezza traccia esterna per riflessione computazionale
+
+</li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-3'>
+
+Definition positivo := { n : nat | ~ n = 0 }.
+Locate "{ _ | _ }".
+Print sig.
+
+Definition pred (x : positivo) : nat :=
+match x with
+| exist n p =>
+    match n with
+    | O => fun abs : ~ O = O =>
+               match abs (erefl 0) with end
+    | S x => fun _ => x
+    end 
+      (p : ~ n = 0)
+end.
+
+Lemma not_3_0 : ~ (3 = 0).
+Proof.
+move=> E.
+change (match 3 with O => True | S _ => False end).
+rewrite E.
+apply: I.
+Qed.
+
+Definition n3p : positivo := exist _ 3 not_3_0.
+
+Definition e := pred n3p.
+
+(* Extraction Language Haskell. *)
+Recursive Extraction e.
+
+</textarea></div>
+<div><p>
+Ora proviamo il programma estratto in
+    <a href="https://try.ocamlpro.com/">OCaml</a> <p>
+ </div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
+ Applicazione: Verfica di prove di matematica
+</h2>
+
+<p>
+   La libreria <a href="http://math-comp.github.io/math-comp/">Mathematical Components</a>
+   e il <a href="https://math-comp.github.io/mcb/">Libro (draft)</a> sulla formalizzazione in Coq
+   di tale libreria.
+<p>
+   Tecniche utilizzate:
+<p>
+<ul class="doclist">
+  <li> riflessione booleana (predicati decidibili = programmi)
+
+  </li>
+<li> programmazione logica (inferenza di tipo à la type-classes)
+
+</li>
+</ul>
+<p>
+</div>
+<div><textarea id='coq-ta-4'>
+
+From mathcomp Require Import all_ssreflect.
+
+Lemma test_tuple A n (t : n.-tuple A):
+  size t = size (rev (map id t)).
+Proof.
+rewrite size_tuple.
+(*
+Check (erefl _ : size (rev (map id (tval t))) = size (tval _)).
+Check rev_tuple.
+Print rev_tuple.
+Check rev_tupleP.
+*)
+rewrite size_tuple.
+by [].
+Qed.
+
+From mathcomp Require Import all_fingroup.
+Open Scope group_scope.
+
+Lemma test (gT : finGroupType) (G H : {group gT}) : 1 \in G :&: H.
+Proof.
+Check (G :&: H).
+About group1.
+Check (erefl _ :  (G :&: H) = gval _).
+About setI_group.
+Print setI_group.
+About group_setI.
+change (1 \in gval (setI_group G H)).
+apply: group1.
+Qed.
+
+Close Scope group_scope.
+Open Scope nat_scope.
+
+</textarea></div>
+<div><p>
+</div> <p>
+<hr/>
+ <p>
+ <div class='slide'> 
+<h2>
   
 </h2>
 
@@ -73,7 +199,7 @@ From mathcomp Require Import all_ssreflect.
 <p>
 <ul class="doclist">
   <li> nella teoria dei tipi dimostrare <tt>2+3=3+2</tt> è facile,
-     o meglio, la dimostrazione è <em>molto</em> corta <tt>apply: refl</tt>
+     o meglio, la dimostrazione è <em>molto</em> corta <tt>apply: erefl</tt>
 
   </li>
 <li> tale dimostrazione non dipende dalla taglia delle espressioni
@@ -85,7 +211,7 @@ From mathcomp Require Import all_ssreflect.
 <p>
 <ul class="doclist">
   <li> il calcollo è completo su termini chiusi, se sono presenti
-     variabili dobbiamo rgionare per induzione o riutilizzare lemmi
+     variabili dobbiamo ragionare per induzione o riutilizzare lemmi
      dimostrati in precendenza, eg <tt>x + 0 = x</tt>
 
   </li>
@@ -102,7 +228,7 @@ From mathcomp Require Import all_ssreflect.
 
   </li>
 <li> e non importa quanti <quote>passi</quote> di esecuzione <tt>p</tt> faccia
-     la prova di <tt>p x = y</tt> è sempre <tt>refl</tt>
+     la prova di <tt>p x = y</tt> è sempre <tt>erefl</tt>
 
 </li>
 </ul>
@@ -118,7 +244,7 @@ From mathcomp Require Import all_ssreflect.
    induttivo) alle espressioni nel monoide.
 <p>
  </div> </div>
-<div><textarea id='coq-ta-3'>
+<div><textarea id='coq-ta-5'>
 
 Inductive Syntax A :=
   | Identity
@@ -154,7 +280,7 @@ Definition example : Syntax nat :=
   espressione sintattica in un monoide
 <p>
  </div>
-<div><textarea id='coq-ta-4'>
+<div><textarea id='coq-ta-6'>
 
 Fixpoint interp {A} op id (m : Syntax A) :=
   match m with
@@ -164,6 +290,7 @@ Fixpoint interp {A} op id (m : Syntax A) :=
   end.
 
 Eval compute -[addn] in interp addn 0 example.
+Eval compute -[muln] in interp muln 1 example.
 
 </textarea></div>
 <div><p>
@@ -181,7 +308,7 @@ Eval compute -[addn] in interp addn 0 example.
      Op x (Op y z) --> Op (Op x y) z
 <p>
 </div>
-<div><textarea id='coq-ta-5'>
+<div><textarea id='coq-ta-7'>
 
 Fixpoint norm {A} (m : Syntax A) :=
   match m with
@@ -200,12 +327,6 @@ Fixpoint norm {A} (m : Syntax A) :=
 
 Eval compute -[addn] in interp addn 0 (norm example).
 
-Lemma norm_ok_example :
-  interp addn 0 example = interp addn 0 (norm example).
-Proof.
-apply: (erefl (3+2)).
-Qed.
-
 </textarea></div>
 <div><p>
 </div> <p>
@@ -216,7 +337,7 @@ Qed.
  Correttezza dell'algoritmo di normalizzazione
 </h2>
 </div>
-<div><textarea id='coq-ta-6'>
+<div><textarea id='coq-ta-8'>
 
 Lemma norm_ok {A op id} :
   (forall a b c, op a (op b c) = op (op a b) c) ->
@@ -230,12 +351,14 @@ elim: m => //= e1 -> e2 ->.
 by case: (norm e1); case: (norm e2) => /=.
 Qed.
 
-Lemma test x y :
+Lemma test2 x y :
   x + (y + 0) + 0 = x + y.
 Proof.
+rewrite /=.
 pose s := Op (Op (Value x) (Op (Value y) Identity)) Identity.
 change (interp addn 0 s = x+y).
 rewrite (norm_ok addnA add0n addn0).
+rewrite /=.
 apply: erefl.
 Qed.
 
@@ -270,63 +393,50 @@ Qed.
   Soluzione: la funzione di reificazione la scriviamo un
   linguaggio che non è la teoria dei tipi ;-)
 <p>
-  Fortna: non ci interessa dimostrarla corretta, basta
+  Fortuna: non ci interessa dimostrarla corretta, basta
   che lo sia in pratica.
 <p>
 </div>
-<div><textarea id='coq-ta-7'>
+<div><textarea id='coq-ta-9'>
 
-Ltac quote t :=
+Ltac quote op id t :=
   match t with
-  | (?a + ?b) =>
-        let x := quote a in
-        let y := quote b in
+  | (op ?a ?b) =>
+        let x := quote op id a in
+        let y := quote op id b in
         uconstr:(Op x y)
-  | 0 => uconstr:(Identity)
+  | id => uconstr:(Identity)
   | ?x => uconstr:(Value x)
   end.
 
-Ltac monoid :=
+Ltac monoid op id opA idL idR :=
   match goal with
   |- ?a = ?b =>
-      let x := quote a in
-      let y := quote b in 
-      change (interp addn 0 x = interp addn 0 y);
-      rewrite [interp addn 0 x](norm_ok addnA add0n addn0);
-      rewrite [interp addn 0 y](norm_ok addnA add0n addn0);
-      compute -[addn]
+      let x := quote op id a in
+      let y := quote op id b in 
+      change (interp op id x = interp op id y);
+      rewrite [interp op id x](norm_ok opA idL idR);
+      rewrite [interp op id y](norm_ok opA idL idR);
+      compute -[op]
   end.
 
-Lemma test2 x y :
+Lemma test3 x y :
   x + (y + 0) + 0 = 0 + x + y.
 Proof.
-monoid.
+monoid addn 0 addnA add0n addn0.
+apply: erefl.
+Qed.
+
+Lemma test4 x y :
+  x * (y * 1) = x * y.
+Proof.
+monoid muln 1 mulnA mul1n muln1.
 apply: erefl.
 Qed.
 
 </textarea></div>
 <div><p>
 </div> <p>
-<hr/>
- <p>
- <div class='slide'> 
-<h2>
- Applicazione: Compilatore certificato CompCert
-</h2>
-
-<p>
- </div> <p>
-<hr/>
- <p>
- <div class='slide'> 
-<h2>
- Applicazione: Verfica di prove di matematica
-</h2>
-
-<p>
- </div> <p>
-<hr/>
- <p>
  <div class='slide'> 
 <h2>
  Esercizio:
@@ -334,9 +444,23 @@ Qed.
 
 <p>
    aggiungere un elemento assorbente
-   al monoide (sintassi, interpretazione, normalizzazione
-   e prova di correttezza) 
-<p>
+   al monoide (sintassi, interpretazione, normalizzazione,
+   prova di correttezza, codice <tt>quote</tt> e codice <tt>monoid</tt>) 
+</div>
+<div><textarea id='coq-ta-10'>
+
+Lemma esercizio x y :
+  x * (y * 1) * 0 = x * 0.
+Proof.
+(* questa prova deve funzionare:
+monoid muln 1 0 mulnA mul1n muln1 mul0n muln0.
+apply: erefl.
+Qed.
+*)
+Admitted.
+
+</textarea></div>
+<div><p>
 <p>
 
 <button onclick="hide('sol11')">Soluzione</button>
@@ -394,6 +518,29 @@ move=> opA idL idR abdL absR m.
 elim: m => //= e1 -> e2 ->.
 case: (norm e1); case: (norm e2) => //=.
 Qed.
+
+Ltac quote op id abs t :=
+  match t with
+  | (op ?a ?b) =>
+        let x := quote op id abs a in
+        let y := quote op id abs b in
+        uconstr:(Op x y)
+  | id => uconstr:(Identity)
+  | abs => uconstr:(Annihilator)
+  | ?x => uconstr:(Value x)
+  end.
+
+Ltac monoid op id abs opA idL idR absL absR :=
+  match goal with
+  |- ?a = ?b =>
+      let x := quote op id abs a in
+      let y := quote op id abs b in 
+      change (interp op id abs x = interp op id abs y);
+      rewrite [interp op id abs x](norm_ok opA idL idR absL absR);
+      rewrite [interp op id abs y](norm_ok opA idL idR absL absR);
+      compute -[op]
+  end.
+
 </pre>
 </div>
 
@@ -494,11 +641,12 @@ window.onload = init_slides;
 window.onscroll = update_scrolled;
 </script>
  </div>
-<div><textarea id='coq-ta-8'>
+<div><textarea id='coq-ta-11'>
 </textarea></div>
 <script type="text/javascript">
  var coqdoc_ids = ['coq-ta-1',  'coq-ta-2',  'coq-ta-3',  'coq-ta-4', 
-                  'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8'];
+                  'coq-ta-5',  'coq-ta-6',  'coq-ta-7',  'coq-ta-8', 
+                  'coq-ta-9',  'coq-ta-10',  'coq-ta-11'];
 </script>
   </div> <!-- /#document     -->
   </div> <!-- /#code-wrapper -->
